@@ -1,0 +1,5 @@
+<design:component >
+  <design:attribute name="sObjectName" label="Object Name" description="Name of the Salesforce Object" datasource="Account" />
+  <design:attribute name="fields" label="Salesforce Field Names" description="Comma Separated List of Field Names"  />
+
+</design:component>

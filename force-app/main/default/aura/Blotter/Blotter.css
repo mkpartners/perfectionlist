@@ -1,0 +1,64 @@
+.THIS .date {
+    width: 120px;
+  }
+  .THIS .align-top {
+    vertical-align: top;
+  }
+  .THIS .align-bottom {
+    vertical-align: bottom;
+  }
+  .THIS .align-right {
+    float: right;
+  }
+  .THIS .border-left {
+    border-left: 1px solid #dddbda
+  }
+
+  .THIS .row-header {
+      background: #f3f2f2;
+  }
+  
+  /* alternating line colors */
+  /* even out the columns in the selection */
+  /* header row a different color */
+/* is there a way to override a tab */
+
+.THIS #row {
+    background-color: #f3f2f2;
+}
+
+.THIS .slds-form-element__row {
+  margin-bottom: 0;
+}
+
+.THIS .search-section {
+  position: absolute;
+  background: #c9c7c5;
+  padding: 5px;
+  z-index: 99;
+  /* transform: translateX(30%); */
+}
+
+.THIS .hidden {
+  display: none;
+}
+
+.THIS .wrapper-for-icon {
+  height: 15px !important;
+  display: initial;
+}
+
+.THIS .cell {
+  padding: 3px 7px;
+  border-right: 1px solid rgb(221, 219, 218);
+}
+
+.THIS .row {
+  padding: 0;
+}
+
+.THIS .close-icon-wrapper {
+  /* float: right; float seems to remove the onclick functionality although float would be the best way to align it the way we want */
+  height: 19px !important;
+  text-align: right;
+}
