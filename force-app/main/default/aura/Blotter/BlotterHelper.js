@@ -28,6 +28,23 @@
       }
     },
 
+    addStyleClass : function(idToFind, style) {
+      console.log(idToFind, style)
+      let element = document.getElementById(idToFind);
+      if (element) {
+        element.classList.add(style);
+      }
+    },
+
+    removeStyleClass : function(idToFind, style) {
+      console.log(idToFind, style)
+      let element = document.getElementById(idToFind);
+      if (element) {
+        console.log('element found');
+        element.classList.remove(style);
+      }
+    },
+
     compare : function(a, b) {
       return (a || b) ? (!a ? -1 : !b ? 1 : a.localCompare(b)) : 0;
     },

@@ -62,3 +62,7 @@
   height: 19px !important;
   text-align: right;
 }
+
+.THIS .icn svg {
+  fill: #005fb2;
+}

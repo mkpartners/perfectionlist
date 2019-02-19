@@ -53,8 +53,8 @@
         let val = record[col.name] ? record[col.name].toString() : '';
         if (col.filterText) {
           query = col.filterText;
+          console.log(query);
         }
-        // testing some variables out
         if (col.type == 'STRING' && '' != col.filterText && !val.toLowerCase().includes(col.filterText.toLowerCase())) {
           keep = false;
         }
@@ -76,8 +76,17 @@
         filteredRecords.push(records[r]);
       }
     }
+
     component.set('v.columns', columns);
     component.set('v.records', filteredRecords);
+    
+    let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
+    helper.addStyleClass(icon ,'icn')
+
+    console.log(query);
+    if (!query) {
+      helper.removeStyleClass(icon, 'icn');
+    }
   },
   handleSettingsButtonClick: function (component, event, helper) {
     console.log('handleSettingsButtonClick clicked')
@@ -149,5 +158,7 @@
 
     //loop through columns to match the name
     //set filtertext to ''
+    let icon = 'span-icon-wrapper' + event.currentTarget.dataset.value;
+    helper.removeStyleClass(icon ,'icn')
   }
 })

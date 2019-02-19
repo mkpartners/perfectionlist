@@ -9,71 +9,27 @@
   <aura:attribute name='sortOrder' type='Integer' default='1' />
   <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-  llllllll blotter 54 llllllll
+  llllllll blotter 99 llllllll
+  
   <lightning:card title="{!v.cardTitle}" >
-  <!--  <aura:set attribute="actions">
-      <lightning:buttonIconStateful class="align-right" iconName="utility:filterList" selected="{! v.showFilters }" onclick="{! c.handleSettingsButtonClick }" alternativeText="Settings" size="xx-small" />
-    </aura:set> -->
-
-    <!-- creates the search section -->
-    <!-- <div id="headers" class="{!if(v.showFilters,'slds-grid slds-box slds-box_xx-small slds-table_col-bordered slds-grid_vertical-align-end','slds-hide')}"> -->
-      <!-- <aura:iteration items="{!v.columns}" var="column" >
-        <div class="{!'slds-col slds-size_1-of-'+v.columns.length}">
-          <aura:if isTrue="{!column.type == 'STRING'}" >
-            <lightning:input value="{!column.filterText}" name="input1" label="" onchange="{!c.onColumnChange}" />
-          </aura:if>
-          <aura:if isTrue="{!column.type == 'PICKLIST'}" >
-            <lightning:select value="{!column.filterText}" name="select" label="" onchange="{!c.onColumnChange}" >
-              <option value="">-Select One-</option>
-              <aura:iteration items="{!column.picklistValues}" var="option" >
-                <option value="{!option}">{!option}</option>
-              </aura:iteration>
-            </lightning:select>
-          </aura:if>
-          <aura:if isTrue="{!column.type == 'DATE'}" >
-            <lightning:input class="date" type="date" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
-            <lightning:input class="date" type="date" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
-          </aura:if>
-          <aura:if isTrue="{!column.type == 'DATETIME'}" >
-            <lightning:input type="datetime" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
-            <lightning:input type="datetime" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
-          </aura:if>
-        </div>
-      </aura:iteration>
-    </div> -->
-    <!-- end creating the search section -->
-
-    <!-- creates the headers of the table -->
-    <!-- <div id="headers" class="slds-grid slds-box slds-box_xx-small slds-table_col-bordered row-header">
-      <aura:iteration items="{!v.columns}" var="column" >
-        <div class="{!'slds-col slds-size_1-of-'+v.columns.length}">
-          <strong>{!column.label}</strong>
-        </div>
-      </aura:iteration>
-    </div>    -->
-    <!-- end creating the headers of the table  -->
-
-    <!-- testing out a different way to create the headers -->
     <div id="headers" class="slds-grid slds-box slds-box_xx-small slds-table_col-bordered row-header row">
       <aura:iteration items="{!v.columns}" var="column" indexVar="index">
         <div class="{!'slds-col cell slds-size_1-of-'+v.columns.length}">
-          <strong onclick="{!c.alphabetize}" data-value="{!column.name}">{!column.label}
-              <!-- <lightning:icon class="align-right" iconName="utility:sort" selected="{! v.showFilters }"  alternativeText="Settings" value="{! v.this }" size="xx-small" data-value="{!column.name}" onclick="{!c.alphabetize}" /> -->
+          <strong onclick="{!c.alphabetize}" data-value="{!column.name}" data-index="{!index}">{!column.label}
               <lightning:icon iconName="utility:sort" size="xx-small" />
             </strong>
 
-          <span class='wrapper-for-icon' onclick="{! c.handleFilterSpanClick }" data-value="{!index}">
-            <lightning:icon class="align-right" iconName="utility:filter" selected="{! v.showFilters }"  alternativeText="Settings" value="{! v.this }" size="xx-small" data-index="{!index}" />
+          <span class='wrapper-for-icon' id="{! 'span-icon-wrapper' + index}" onclick="{! c.handleFilterSpanClick }" data-value="{!index}">
+            <lightning:icon class="align-right" iconName="utility:filterList" selected="{! v.showFilters }"  alternativeText="Settings" value="{! v.this }" size="xx-small" data-index="{!index}" />
           </span>
-            <!-- <lightning:icon class="align-right" iconName="utility:filter" selected="{! v.showFilters }" onclick="{! c.handleSettingsButtonClick(index) }" alternativeText="Settings" value="{! v.this }" size="xx-small" data-index="{!index}" /> -->
-        <!-- </div> -->
-        <!-- <div class="{!'slds-col slds-size_1-of-'+v.columns.length}"> -->
             <div id="{! 'filterDiv' + index }" class='search-section hidden'>
               <div class="close-icon-wrapper" onclick="{!c.handleFilterSpanClick}" data-value="{!index}" data-columnName="{!column.name}">
                 <lightning:icon iconName="utility:close" size="xx-small" value="{! v.this }" />
               </div>
             <aura:if isTrue="{!column.type == 'STRING' || column.type == 'PHONE'}" >
-              <lightning:input value="{!column.filterText}" id="{!'inputSearch' + index}" placeholder="search here" name="input1" label="{! 'Filter through ' + column.label}" onchange="{!c.onColumnChange}" />
+              <div data-index="{!index}" onchange="{!c.onColumnChange}">
+                  <lightning:input value="{!column.filterText}" id="{!'inputSearch' + index}" placeholder="search here" name="input1" label="{! 'Filter through ' + column.label}" data-index="{!index}" />
+              </div>
               <span onclick="{!c.resetColumn}" data-value="{!index}">reset</span>
             </aura:if>
             <aura:if isTrue="{!column.type == 'PICKLIST'}" >
@@ -94,10 +50,8 @@
             </aura:if>
             </div>
           </div>
-        <!-- </div> -->
       </aura:iteration>
     </div>   
-    <!-- end test -->
 
     <!-- create the table rows -->
     <div id="records" class="records">
@@ -116,73 +70,4 @@
     <!-- end creating the table rows -->
   </lightning:card>
   
-  <!-- test field to convert to a search input-->
-  
-  <!-- end of the test field -->
-
-
-<!--NOT USING THIS STUFF
-
-  <div class="slds-table_edit_container slds-is-relative">
-    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped slds-table_col-bordered">
-      <thead>
-        <tr>
-          <aura:iteration items="{!v.columns}" var="column" >
-            <th class="align-bottom" scope="col">
-              <div class="{!if(v.showFilters,'slds-truncate','slds-hide')}">
-                <aura:if isTrue="{!column.type == 'STRING'}" >
-                  <lightning:input value="{!column.filterText}" name="input1" label="" onchange="{!c.onColumnChange}" />
-                </aura:if>
-                <aura:if isTrue="{!column.type == 'PICKLIST'}" >
-                  <lightning:select value="{!column.filterText}" name="select" label="" onchange="{!c.onColumnChange}" >
-                    <option value="">-Select One-</option>
-                    <aura:iteration items="{!column.picklistValues}" var="option" >
-                      <option value="{!option}">{!option}</option>
-                    </aura:iteration>
-                  </lightning:select>
-                </aura:if>
-                <aura:if isTrue="{!column.type == 'DATE'}" >
-                  <lightning:input class="date" type="date" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
-                  <lightning:input class="date" type="date" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
-                </aura:if>
-                <aura:if isTrue="{!column.type == 'DATETIME'}" >
-                  <lightning:input type="datetime" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
-                  <lightning:input type="datetime" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
-                </aura:if>
-              </div>
-              <aura:if isTrue="{!column.isLast}" >
-                <lightning:buttonIconStateful class="align-right" iconName="utility:settings" selected="{! v.showFilters }" onclick="{! c.handleSettingsButtonClick }" alternativeText="Settings" size="small" />
-              </aura:if>
-            </th>
-          </aura:iteration>
-        </tr>
-        
-        <tr class="slds-line-height_reset">
-          <aura:iteration items="{!v.columns}" var="column" >
-            <th class="align-bottom" scope="col">
-              <div class="slds-truncate" title="{!column.label}">
-                {!column.label}
-              </div>
-            </th>
-          </aura:iteration>
-        </tr>
-      </thead>
-      <tbody>
-        <aura:iteration items="{!v.records}" var="record" >
-          <tr class="slds-hint-parent">
-
-          <lightning:recordViewForm recordId="{!record.Id}" objectApiName="{!v.sObjectName}" >
-              <aura:iteration items="{!v.columns}" var="column" >
-                <td data-label="{!column.label}" >
-                    <lightning:outputField fieldName="{!column.name}" variant="label-hidden" />
-                </td>
-              </aura:iteration>
-          </lightning:recordViewForm>
-          </tr>
-
-        </aura:iteration>
-      </tbody>
-    </table>
-  </div>
-  -->
 </aura:component>
