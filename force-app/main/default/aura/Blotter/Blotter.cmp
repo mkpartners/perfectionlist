@@ -7,8 +7,9 @@
   <aura:attribute name="records" type="List" />
   <aura:attribute name="showFilters" type="Boolean" />
   <aura:attribute name='sortOrder' type='Integer' default='1' />
+  <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-  llllllll blotter 1.0102 llllllll
+  llllllll blotter 42 llllllll
   <lightning:card title="{!v.cardTitle}" >
   <!--  <aura:set attribute="actions">
       <lightning:buttonIconStateful class="align-right" iconName="utility:filterList" selected="{! v.showFilters }" onclick="{! c.handleSettingsButtonClick }" alternativeText="Settings" size="xx-small" />
