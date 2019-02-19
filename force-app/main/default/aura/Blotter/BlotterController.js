@@ -100,39 +100,38 @@
     var records = component.get('v.records');
     var columnToSortBy = event.currentTarget.dataset.value;
     console.log('clicked');
-    let sorted
     //check if the state already has a direction and column
     let direction = component.get('v.sortState.direction');
     let column = component.get('v.sortState.column')
-
+    helper.log(records)
     // determine if we are going to be switching the order
-    let oppositeDirection = column == columnToSortBy && direction == 'asc' ? 'dsc' : 'asc';  
-    // console.log('opposite directin from line 110: ' + oppositeDirection);
+    let directionToSortBy = column == columnToSortBy && direction == 'asc' ? 'dsc' : 'asc';  
+    // console.log('opposite directin from line 110: ' + directionToSortBy);
     // //if the old column matches the new column we should reverse the order and set the state to what we just did
     // if (!column && !direction) {
     //   console.log('there was no previous column set in the state');
-    //   let sortedRecords = helper.sort(records, columnToSortBy, oppositeDirection)
+    //   let sortedRecords = helper.sort(records, columnToSortBy, directionToSortBy)
 
-    //   component.set('v.sortState.direction', oppositeDirection);
+    //   component.set('v.sortState.direction', directionToSortBy);
     //   component.set('v.records', sortedRecords);
     //   //check if the previous column field is equal to the new column, if they are equal we just reverse the order and move on with our day
     // } else if (column == columnToSortBy) {
-    //   let sortedRecords = helper.sort(records, columnToSortBy, oppositeDirection)
+    //   let sortedRecords = helper.sort(records, columnToSortBy, directionToSortBy)
     //   component.set('v.records', sortedRecords);
-    //   component.set('v.sortState.direction', oppositeDirection)
+    //   component.set('v.sortState.direction', directionToSortBy)
     //   console.log('the old column is the same as the new column');
     //   //if the old column is not equal to the new column 
     // } else if (column !== columnToSortBy) {
-    //   let sortedRecords = helper.sort(records, columnToSortBy, oppositeDirection)
+    //   let sortedRecords = helper.sort(records, columnToSortBy, directionToSortBy)
     //   component.set('v.records', sortedRecords);
-    //   component.set('v.sortState.direction', oppositeDirection);
+    //   component.set('v.sortState.direction', directionToSortBy);
     //   console.log('we are switching columns that we sort by')
     // } 
 
     // always at the bottom set the new state
-    component.set('v.sortState.direction', oppositeDirection);
+    component.set('v.sortState.direction', directionToSortBy);
     component.set('v.sortState.column', columnToSortBy);
-    component.set('v.records', helper.sort(records, columnToSortBy, oppositeDirection))
+    component.set('v.records', helper.sort(records, columnToSortBy, directionToSortBy))
 
   },
 
