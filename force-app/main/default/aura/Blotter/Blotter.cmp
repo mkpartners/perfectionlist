@@ -9,14 +9,14 @@
   <aura:attribute name='sortOrder' type='Integer' default='1' />
   <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-  llllllll blotter 99 llllllll
-  
+  llllllll blotter 21 llllllll
+
   <lightning:card title="{!v.cardTitle}" >
     <div id="headers" class="slds-grid slds-box slds-box_xx-small slds-table_col-bordered row-header row">
       <aura:iteration items="{!v.columns}" var="column" indexVar="index">
         <div class="{!'slds-col cell slds-size_1-of-'+v.columns.length}">
           <strong onclick="{!c.alphabetize}" data-value="{!column.name}" data-index="{!index}">{!column.label}
-              <lightning:icon iconName="utility:sort" size="xx-small" />
+              <lightning:icon class='icon' iconName="utility:sort" size="xx-small" />
             </strong>
 
           <span class='wrapper-for-icon' id="{! 'span-icon-wrapper' + index}" onclick="{! c.handleFilterSpanClick }" data-value="{!index}">
@@ -28,17 +28,21 @@
               </div>
             <aura:if isTrue="{!column.type == 'STRING' || column.type == 'PHONE'}" >
               <div data-index="{!index}" onchange="{!c.onColumnChange}">
-                  <lightning:input value="{!column.filterText}" id="{!'inputSearch' + index}" placeholder="search here" name="input1" label="{! 'Filter through ' + column.label}" data-index="{!index}" />
+                  <lightning:input aura:id='aura-input' value="{!column.filterText}" id="{!'inputSearch' + index}" placeholder="search here" name="input1" label="{! 'Filter through ' + column.label}" data-index="{!index}" />
               </div>
-              <span onclick="{!c.resetColumn}" data-value="{!index}">reset</span>
+              <span onclick="{!c.resetColumn}" data-value="{!index}">
+                <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
+              </span>
             </aura:if>
             <aura:if isTrue="{!column.type == 'PICKLIST'}" >
-              <lightning:select value="{!column.filterText}" name="select" label="{! 'Filter through ' + column.label}" onchange="{!c.onColumnChange}" >
-                <option value="">-Select One-</option>
-                <aura:iteration items="{!column.picklistValues}" var="option" >
-                  <option value="{!option}">{!option}</option>
-                </aura:iteration>
-              </lightning:select>
+              <div data-index="{!index}" onchange="{!c.onColumnChange}">
+                <lightning:select value="{!column.filterText}" name="select" label="{! 'Filter through ' + column.label}" onchange="{!c.onColumnChange}" >
+                    <option value="">-Select One-</option>
+                    <aura:iteration items="{!column.picklistValues}" var="option" >
+                      <option value="{!option}">{!option}</option>
+                    </aura:iteration>
+                  </lightning:select>
+              </div>
             </aura:if>
             <aura:if isTrue="{!column.type == 'DATE'}" >
               <lightning:input class="date" type="date" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>

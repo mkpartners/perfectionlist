@@ -40,6 +40,7 @@
     // component.set('v.showFilters', false);
     $A.enqueueAction(action);
   },
+
   onColumnChange: function (component, event, helper) {
     let columns = component.get('v.columns');
     let records = component.get('v.queriedRecords');
@@ -53,7 +54,6 @@
         let val = record[col.name] ? record[col.name].toString() : '';
         if (col.filterText) {
           query = col.filterText;
-          console.log(query);
         }
         if (col.type == 'STRING' && '' != col.filterText && !val.toLowerCase().includes(col.filterText.toLowerCase())) {
           keep = false;
@@ -79,28 +79,26 @@
 
     component.set('v.columns', columns);
     component.set('v.records', filteredRecords);
-    
-    let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
-    helper.addStyleClass(icon ,'icn')
 
-    console.log(query);
-    if (!query) {
-      helper.removeStyleClass(icon, 'icn');
+    if (event.currentTarget.dataset !== undefined) { 
+      let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
+      helper.addStyleClass(icon, 'icn');
+      if (query === undefined || query == '') {
+        helper.removeStyleClass(icon, 'icn');
+      }
+    } else { 
+      console.log('not actually defined')
     }
   },
+
   handleSettingsButtonClick: function (component, event, helper) {
-    console.log('handleSettingsButtonClick clicked')
-    console.log(event.target.value);
-    console.log(event.getSource().get('v.value'))
     component.set('v.showFilters', !component.get('v.showFilters'));
   },
 
   handleFilterSpanClick: function (component, event, helper) {
-    console.log('clicked');
     var ctarget = event.currentTarget;
     var filterDivId = ctarget.dataset.value;
     var displayOption = document.getElementById('filterDiv' + filterDivId);
-    console.log(displayOption);
     displayOption.classList.toggle('hidden');
   },
 
@@ -108,36 +106,14 @@
    // let columns = component.get('v.columns');
     var records = component.get('v.records');
     var columnToSortBy = event.currentTarget.dataset.value;
-    console.log('clicked');
+    
     //check if the state already has a direction and column
     let direction = component.get('v.sortState.direction');
     let column = component.get('v.sortState.column')
-    helper.log(records)
+    
     // determine if we are going to be switching the order
     let directionToSortBy = column == columnToSortBy && direction == 'asc' ? 'dsc' : 'asc';  
-    // console.log('opposite directin from line 110: ' + directionToSortBy);
-    // //if the old column matches the new column we should reverse the order and set the state to what we just did
-    // if (!column && !direction) {
-    //   console.log('there was no previous column set in the state');
-    //   let sortedRecords = helper.sort(records, columnToSortBy, directionToSortBy)
-
-    //   component.set('v.sortState.direction', directionToSortBy);
-    //   component.set('v.records', sortedRecords);
-    //   //check if the previous column field is equal to the new column, if they are equal we just reverse the order and move on with our day
-    // } else if (column == columnToSortBy) {
-    //   let sortedRecords = helper.sort(records, columnToSortBy, directionToSortBy)
-    //   component.set('v.records', sortedRecords);
-    //   component.set('v.sortState.direction', directionToSortBy)
-    //   console.log('the old column is the same as the new column');
-    //   //if the old column is not equal to the new column 
-    // } else if (column !== columnToSortBy) {
-    //   let sortedRecords = helper.sort(records, columnToSortBy, directionToSortBy)
-    //   component.set('v.records', sortedRecords);
-    //   component.set('v.sortState.direction', directionToSortBy);
-    //   console.log('we are switching columns that we sort by')
-    // } 
-
-    // always at the bottom set the new state
+    
     component.set('v.sortState.direction', directionToSortBy);
     component.set('v.sortState.column', columnToSortBy);
     component.set('v.records', helper.sort(records, columnToSortBy, directionToSortBy))
@@ -145,13 +121,18 @@
   },
 
   resetColumn: function(component, event, helper) {
-    console.log('resetting the columns')
     var getTheProperId = 'inputSearch' + event.currentTarget.dataset.value;
-    console.log('inputSearch' + getTheProperId);
     var records = component.get('v.queriedRecords');
-    // helper.consoleLogArrayOfObjects(records);
     component.set('v.records', records);
+
     let columns = component.get('v.columns');
+    let matches = component.find('aura-input');
+    
+    matches.forEach(match => {
+      if (match.get('v.id') == 'inputSearch' + event.currentTarget.dataset.value) {
+        match.set('v.value', '');
+      }
+    })
     //clear 1 column, filter entire array
     //add attribute to the column asc/dsc
     // document.getElementById(getTheProperId).value() = '';

@@ -4,13 +4,16 @@
     },
 
     sort : function(list, column, direction) {
-      console.log('sorting')
       if (direction == 'asc' || !direction) {
         return list.sort(function(a, b) {
           if (a[column] > b[column]) {
             return 1;
           }
           else if (a[column] < b[column]) {
+            return -1;
+          } else if (a[column] == null) {
+            return 1;
+          } else if (b[column] == null) {
             return -1;
           }
           else return 0;
@@ -29,18 +32,17 @@
     },
 
     addStyleClass : function(idToFind, style) {
-      console.log(idToFind, style)
       let element = document.getElementById(idToFind);
       if (element) {
         element.classList.add(style);
+      } else {
+        this.removeStyleClass(idToFind, style)
       }
     },
 
     removeStyleClass : function(idToFind, style) {
-      console.log(idToFind, style)
       let element = document.getElementById(idToFind);
       if (element) {
-        console.log('element found');
         element.classList.remove(style);
       }
     },
