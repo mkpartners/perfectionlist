@@ -45,7 +45,7 @@
     let columns = component.get('v.columns');
     let records = component.get('v.queriedRecords');
     let filteredRecords = [];
-    let query;
+    let query, fromDate, toDate;
     for (let r in records) {
       let record = records[r];
       let keep = true;
@@ -53,7 +53,7 @@
         let col = columns[c];
         let val = record[col.name] ? record[col.name].toString() : '';
         if (col.filterText) {
-          query = col.filterText;
+          query = col.filterText || col.filterFromDate || col.filterToDate;
         }
         if (col.type == 'STRING' && '' != col.filterText && !val.toLowerCase().includes(col.filterText.toLowerCase())) {
           keep = false;
@@ -119,17 +119,26 @@
     component.set('v.records', helper.sort(records, columnToSortBy, directionToSortBy))
 
   },
-
+  //trying to reset back to the queried columns and not the original list
   resetColumn: function(component, event, helper) {
-    var getTheProperId = 'inputSearch' + event.currentTarget.dataset.value;
+    var inputSearch = 'inputSearch' + event.currentTarget.dataset.value;
     var records = component.get('v.queriedRecords');
     component.set('v.records', records);
-
     let columns = component.get('v.columns');
     let matches = component.find('aura-input');
     
+    let picks = component.find('aura-pick');
+    let targetPick = 'select' + event.currentTarget.dataset.value;
+    if (picks.length > 0) {
+      picks.forEach(pick => {
+        if (pick.get('v.name') == targetPick) {
+          pick.set('v.value', '');
+        }
+      })
+    }
+
     matches.forEach(match => {
-      if (match.get('v.id') == 'inputSearch' + event.currentTarget.dataset.value) {
+      if (match.get('v.id') == inputSearch) {
         match.set('v.value', '');
       }
     })

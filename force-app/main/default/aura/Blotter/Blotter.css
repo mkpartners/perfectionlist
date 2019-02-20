@@ -36,6 +36,7 @@
   background: #c9c7c5;
   padding: 5px;
   z-index: 99;
+  width: inherit;
   /* transform: translateX(30%); */
 }
 

@@ -1,4 +1,5 @@
 <aura:component controller="BlotterController" implements="force:appHostable,flexipage:availableForAllPageTypes">
+  
   <aura:attribute name="sObjectName" type="String" default="Account" />
   <aura:attribute name="fields" type="String" description="Comma Separated List" default="Name,Type,Industry,Phone,BillingState,LastModifiedDate" />
   <aura:attribute name="cardTitle" type="String" default="Account Blotter" />
@@ -9,9 +10,10 @@
   <aura:attribute name='sortOrder' type='Integer' default='1' />
   <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-  llllllll blotter 21 llllllll
+  llllllll blotter 56 llllllll
 
   <lightning:card title="{!v.cardTitle}" >
+
     <div id="headers" class="slds-grid slds-box slds-box_xx-small slds-table_col-bordered row-header row">
       <aura:iteration items="{!v.columns}" var="column" indexVar="index">
         <div class="{!'slds-col cell slds-size_1-of-'+v.columns.length}">
@@ -36,21 +38,30 @@
             </aura:if>
             <aura:if isTrue="{!column.type == 'PICKLIST'}" >
               <div data-index="{!index}" onchange="{!c.onColumnChange}">
-                <lightning:select value="{!column.filterText}" name="select" label="{! 'Filter through ' + column.label}" onchange="{!c.onColumnChange}" >
+                <lightning:select value="{!column.filterText}" aura:id="aura-pick" name="{!'select' + index}" label="{! 'Filter through ' + column.label}" >
                     <option value="">-Select One-</option>
                     <aura:iteration items="{!column.picklistValues}" var="option" >
                       <option value="{!option}">{!option}</option>
                     </aura:iteration>
                   </lightning:select>
+                  <span onclick="{!c.resetColumn}" data-value="{!index}">
+                    <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
+                  </span>
               </div>
             </aura:if>
             <aura:if isTrue="{!column.type == 'DATE'}" >
               <lightning:input class="date" type="date" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
               <lightning:input class="date" type="date" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
+              <span onclick="{!c.resetColumn}" data-value="{!index}">
+                <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
+              </span>
             </aura:if>
             <aura:if isTrue="{!column.type == 'DATETIME'}" >
               <lightning:input type="datetime" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
               <lightning:input type="datetime" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
+              <span onclick="{!c.resetColumn}" data-value="{!index}">
+                <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
+              </span>
             </aura:if>
             </div>
           </div>
