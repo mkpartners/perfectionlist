@@ -10,7 +10,7 @@
   <aura:attribute name='sortOrder' type='Integer' default='1' />
   <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-  llllllll blotter 56 llllllll
+  llllllll blotter 20 llllllll
 
   <lightning:card title="{!v.cardTitle}" >
 
@@ -50,15 +50,15 @@
               </div>
             </aura:if>
             <aura:if isTrue="{!column.type == 'DATE'}" >
-              <lightning:input class="date" type="date" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
-              <lightning:input class="date" type="date" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
+              <lightning:input aura:id="aura-date" class="date" type="date" name="{!'from' + index}" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
+              <lightning:input aura:id="aura-date" class="date" type="date" name="{!'to' + index}" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
               <span onclick="{!c.resetColumn}" data-value="{!index}">
                 <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
               </span>
             </aura:if>
             <aura:if isTrue="{!column.type == 'DATETIME'}" >
-              <lightning:input type="datetime" name="from" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
-              <lightning:input type="datetime" name="to" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
+              <lightning:input aura:id="aura-date" type="datetime" name="{!'from' + index}" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
+              <lightning:input aura:id="aura-date" type="datetime" name="{!'to' + index}" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />
               <span onclick="{!c.resetColumn}" data-value="{!index}">
                 <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
               </span>

@@ -26,7 +26,7 @@
 
       }
       else if (state === "ERROR") {
-        var errors = response.getError();
+        let errors = response.getError();
         if (errors) {
           if (errors[0] && errors[0].message) {
             console.log("Error message: " + errors[0].message);
@@ -79,7 +79,7 @@
 
     component.set('v.columns', columns);
     component.set('v.records', filteredRecords);
-
+    
     if (event.currentTarget.dataset !== undefined) { 
       let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
       helper.addStyleClass(icon, 'icn');
@@ -87,7 +87,7 @@
         helper.removeStyleClass(icon, 'icn');
       }
     } else { 
-      console.log('not actually defined')
+      console.log('not actually defined');
     }
   },
 
@@ -96,37 +96,39 @@
   },
 
   handleFilterSpanClick: function (component, event, helper) {
-    var ctarget = event.currentTarget;
-    var filterDivId = ctarget.dataset.value;
-    var displayOption = document.getElementById('filterDiv' + filterDivId);
-    displayOption.classList.toggle('hidden');
+    let target = 'filterDiv' + event.currentTarget.dataset.value;
+    document.getElementById(target).classList.toggle('hidden');
   },
 
   alphabetize: function (component, event, helper) {
-   // let columns = component.get('v.columns');
-    var records = component.get('v.records');
-    var columnToSortBy = event.currentTarget.dataset.value;
-    
+    let records = component.get('v.records');
+    let columnToSortBy = event.currentTarget.dataset.value;
+
     //check if the state already has a direction and column
     let direction = component.get('v.sortState.direction');
-    let column = component.get('v.sortState.column')
-    
+    let column = component.get('v.sortState.column');
     // determine if we are going to be switching the order
     let directionToSortBy = column == columnToSortBy && direction == 'asc' ? 'dsc' : 'asc';  
     
     component.set('v.sortState.direction', directionToSortBy);
     component.set('v.sortState.column', columnToSortBy);
-    component.set('v.records', helper.sort(records, columnToSortBy, directionToSortBy))
+    component.set('v.records', helper.sort(records, columnToSortBy, directionToSortBy));
 
   },
   //trying to reset back to the queried columns and not the original list
   resetColumn: function(component, event, helper) {
-    var inputSearch = 'inputSearch' + event.currentTarget.dataset.value;
-    var records = component.get('v.queriedRecords');
+    let records = component.get('v.queriedRecords');
     component.set('v.records', records);
-    let columns = component.get('v.columns');
-    let matches = component.find('aura-input');
-    
+    // let columns = component.get('v.columns');
+
+    let inputs = component.find('aura-input');
+    let inputSearch = 'inputSearch' + event.currentTarget.dataset.value;
+    inputs.forEach(input => {
+      if (input.get('v.id') == inputSearch) {
+        input.set('v.value', '');
+      }
+    })
+
     let picks = component.find('aura-pick');
     let targetPick = 'select' + event.currentTarget.dataset.value;
     if (picks.length > 0) {
@@ -137,18 +139,21 @@
       })
     }
 
-    matches.forEach(match => {
-      if (match.get('v.id') == inputSearch) {
-        match.set('v.value', '');
-      }
-    })
-    //clear 1 column, filter entire array
-    //add attribute to the column asc/dsc
-    // document.getElementById(getTheProperId).value() = '';
+    let dates = component.find('aura-date');
+    let dateFrom = 'from' + event.currentTarget.dataset.value;
+    let dateTo = 'to' + event.currentTarget.dataset.value;
+    if (dates.length > 0) {
+      dates.forEach(date => {
+        if (date.get('v.name') == dateTo) {
+          date.set('v.value', '');
+        }
+        if (date.get('v.name') == dateFrom) {
+          date.set('v.value', '');
+        }
+      })
+    }
 
-    //loop through columns to match the name
-    //set filtertext to ''
     let icon = 'span-icon-wrapper' + event.currentTarget.dataset.value;
-    helper.removeStyleClass(icon ,'icn')
+    helper.removeStyleClass(icon ,'icn');
   }
 })

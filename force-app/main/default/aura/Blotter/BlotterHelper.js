@@ -47,10 +47,6 @@
       }
     },
 
-    compare : function(a, b) {
-      return (a || b) ? (!a ? -1 : !b ? 1 : a.localCompare(b)) : 0;
-    },
-
     filterCombiner : function(d, filterArray) {
       for (let fn of filterArray) {
         if (!fn(d)) {
@@ -59,8 +55,4 @@
       }
       return true;
     },
-
-    log: function(arr) {
-      arr.forEach(a => console.log(a))
-    }
   })
