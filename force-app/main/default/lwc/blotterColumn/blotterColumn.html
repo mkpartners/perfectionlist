@@ -1,0 +1,29 @@
+<template>
+    <div key={index} >
+        <div onclick={alphabetize} data-column={column.Name}>
+            <strong>{column.label}</strong>
+            <lightning-icon class="icon" icon-name={lightningIcon} size="xx-small"></lightning-icon>
+        </div>
+        <span class='wrapper-for-icon'>
+            <lightning-icon class='align-right' icon-name='utility:filterList' alternative-text='settings' size='xx-small'></lightning-icon>
+        </span>
+        <div class="search-section hidden">
+            <lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
+            <template if:true={isStringOrPhone}>
+                <lightning-input label='filter through something' value={query} name='special-name' onchange={handleQuery}></lightning-input>
+            </template>
+            <template if:true={isPickList}>
+                <lightning-combobox name={column.name} label={column.label} placeholder='select an option' options={pickOptions} value={select} onchange={handleSelect}></lightning-combobox>
+            </template>
+            <template if:true={isDateTime}>
+                <lightning-input label="From" type="datetime" name="" value={filterFromDate} onchange={handleDate}></lightning-input>
+                <lightning-input label="To" type="datetime" name="" value={filterToDate} onchange={handleDate}></lightning-input>
+            </template>
+            <template if:true={isDate}>
+                <lightning-input label="From" type="date" name="" value={filterFromDate} onchange={handleDate}></lightning-input>
+                <lightning-input label="To" type="date" name="" value={filterToDate} onchange={handleDate}></lightning-input>
+            </template>
+        </div>
+
+    </div>
+</template>

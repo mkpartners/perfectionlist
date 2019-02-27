@@ -1,6 +1,6 @@
 public with sharing class BlotterController {
 
-    @AuraEnabled
+    @AuraEnabled(cacheable = true)
     public static Map<String,Object> initBlotter(
         String sObjectName,
         String fieldsString

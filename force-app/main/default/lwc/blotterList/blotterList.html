@@ -1,5 +1,24 @@
 <template>
-    <lightning-card title='Blotter 2.0'>
+    <lightning-card title='Blotter 26'>
+        <div id="headers" class="slds-grid slds-box slds-box_xx-small slds-table_col-bordered row-header row">
+            <template for:each={columns} for:item="column" iterator:value={index}>
+               <c-blotter-column column={column} query={query} key={column.Id} index={index} onquery={handleQuery} onselect={handleSelect} oncolumn={columnChange}></c-blotter-column>
+            </template>
+            <button onclick={alphabetize}>alskdfjkla</button>
+        </div>
         
+        
+        
+        
+        
+        
+        <template if:true={shouldRender}>
+            <template for:each={records} for:item='record'>
+                {record.Name}
+            </template>
+        </template>
+        <template if:false={records}>
+            <p>No records have been returned from this list view</p>
+        </template>
     </lightning-card>
 </template>

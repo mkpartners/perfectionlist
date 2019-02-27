@@ -9,7 +9,7 @@
     let action = component.get('c.initBlotter');
     action.setParams({ sObjectName: sObjectName, fieldsString: fieldsString });
     action.setCallback(this, function (response) {
-      let state = response.getState();
+      let state = response.getState() ;
       let ret = response.getReturnValue();
       console.info(state, ret);
       if (state === "SUCCESS") {
@@ -19,6 +19,9 @@
         columns[0].sortBy = 'asc';
         for (let i = 1; i < columns.length; i++) {
           columns[i].sortBy = '';
+          //columns havethe sort by field, but might need a new variable
+          //slds-hide, 2 copies, hide , down = desc, 
+          //hover on header if it's not sorted, use z-index to put the color higher
         }
         component.set('v.columns', ret.columns);
       }

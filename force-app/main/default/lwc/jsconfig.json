@@ -6,6 +6,9 @@
             "c/blotlist": [
                 "blotlist/blotlist.js"
             ],
+            "c/blotter-column": [
+                "blotterColumn/blotterColumn.js"
+            ],
             "c/blotter-list": [
                 "blotterList/blotterList.js"
             ]

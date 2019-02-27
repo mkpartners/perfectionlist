@@ -10,7 +10,7 @@
   <aura:attribute name='sortOrder' type='Integer' default='1' />
   <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-  llllllll blotter 20 llllllll
+  llllllll blotter 21 llllllll
 
   <lightning:card title="{!v.cardTitle}" >
 
