@@ -24,6 +24,8 @@
           //hover on header if it's not sorted, use z-index to put the color higher
         }
         component.set('v.columns', ret.columns);
+        component.set('v.recordCount.total', ret.records.length);
+        component.set('v.recordCount.showing', ret.records.length);
       }
       else if (state === "INCOMPLETE") {
 
@@ -82,6 +84,7 @@
 
     component.set('v.columns', columns);
     component.set('v.records', filteredRecords);
+    component.set('v.recordCount.showing', filteredRecords.length);
     
     if (event.currentTarget.dataset !== undefined) { 
       let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
@@ -122,6 +125,7 @@
   resetColumn: function(component, event, helper) {
     let records = component.get('v.queriedRecords');
     component.set('v.records', records);
+    component.set('v.recordCount.showing', records.length);
     // let columns = component.get('v.columns');
 
     let inputs = component.find('aura-input');

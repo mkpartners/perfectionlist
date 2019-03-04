@@ -6,18 +6,25 @@
   <aura:attribute name="columns" type="List" />
   <aura:attribute name="queriedRecords" type="List" />
   <aura:attribute name="records" type="List" />
+  <aura:attribute name="recordCount" type="Map" default="{'showing': 0, total: ''}" />
   <aura:attribute name="showFilters" type="Boolean" />
   <aura:attribute name='sortOrder' type='Integer' default='1' />
   <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-  <lightning:card title="{!v.cardTitle}" >
+    <!-- multiselect -->
+    <!-- end multiselect -->
 
+----- blotter 1 -----
+  <lightning:card title="{!v.cardTitle}" >
+    displaying {!v.recordCount.showing} out of {!v.recordCount.total}
+  <lightning:button onclick='{! c.resetColumn }'>clear</lightning:button>
     <div id="headers" class="slds-grid slds-box slds-box_xx-small slds-table_col-bordered row-header row">
       <aura:iteration items="{!v.columns}" var="column" indexVar="index">
         <div class="{!'slds-col cell slds-size_1-of-'+v.columns.length}">
           <strong onclick="{!c.alphabetize}" data-value="{!column.name}" data-index="{!index}">{!column.label}
               <lightning:icon class='icon' iconName="utility:sort" size="xx-small" />
+              <!-- we need to store the up and down icons here. these should conditionally render, have a class based on the current state of this column. if it's up then it can be showing and the down will have a class set on it to hide it from view. vice versa in the event that it is clicked again. -->
             </strong>
 
           <span class='wrapper-for-icon' id="{! 'span-icon-wrapper' + index}" onclick="{! c.handleFilterSpanClick }" data-value="{!index}">
@@ -36,9 +43,15 @@
               </span>
             </aura:if>
             <aura:if isTrue="{!column.type == 'PICKLIST'}" >
+                <div aura:id="main-div"  class=" slds-picklist slds-dropdown-trigger slds-dropdown-trigger--click ">
+     
+                    
+                  <!-- multiselect-->
+                <!-- end multiselect -->
+
               <div data-index="{!index}" onchange="{!c.onColumnChange}">
                 <lightning:select value="{!column.filterText}" aura:id="aura-pick" name="{!'select' + index}" label="{! 'Filter through ' + column.label}" >
-                    <option value="">-Select One-</option>
+                    <option value="">All</option>
                     <aura:iteration items="{!column.picklistValues}" var="option" >
                       <option value="{!option}">{!option}</option>
                     </aura:iteration>
