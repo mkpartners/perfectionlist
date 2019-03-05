@@ -49,6 +49,9 @@
   onColumnChange: function (component, event, helper) {
     let columns = component.get('v.columns');
     let records = component.get('v.queriedRecords');
+    console.log('on column change is called');
+    let currentFilters = component.get('v.columnFilters');
+    helper.log(currentFilters);
     let filteredRecords = [];
     let query, fromDate, toDate;
     for (let r in records) {
@@ -57,6 +60,8 @@
       for (let c in columns) {
         let col = columns[c];
         let val = record[col.name] ? record[col.name].toString() : '';
+        let colName = columns[c].label;
+
         if (col.filterText) {
           query = col.filterText || col.filterFromDate || col.filterToDate;
         }
@@ -66,7 +71,7 @@
         else if (col.type == 'PHONE' && '' != col.filterText && !val.includes(col.filterText)) {
           keep = false;
         }
-        else if (col.type == 'PICKLIST' && '' != col.filterText && col.filterText != val) {
+        else if (col.type == 'PICKLIST' && helper.findInArray(currentFilters, colName, val)) {
           keep = false;
         }
         else if ((col.type == 'DATE' || col.type == 'DATETIME') && null != col.filterFromDate && '' != col.filterFromDate && col.filterFromDate > val) {
@@ -135,6 +140,8 @@
         input.set('v.value', '');
       }
     })
+
+    component.set('v.columnFilters', {});
 
     let picks = component.find('aura-pick');
     let targetPick = 'select' + event.currentTarget.dataset.value;

@@ -10,12 +10,15 @@
   <aura:attribute name="showFilters" type="Boolean" />
   <aura:attribute name='sortOrder' type='Integer' default='1' />
   <aura:attribute name='sortState' type='Map' default="{'column': '', direction: ''}" />
+  <aura:attribute name='columnFilters' type='Map' default="{}" />
   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+  <aura:method name='onColumnChange'/>
 
     <!-- multiselect -->
     <!-- end multiselect -->
 
------ blotter 1 -----
+----- blotter 41 -----
   <lightning:card title="{!v.cardTitle}" >
     displaying {!v.recordCount.showing} out of {!v.recordCount.total}
   <lightning:button onclick='{! c.resetColumn }'>clear</lightning:button>
@@ -31,7 +34,7 @@
             <lightning:icon class="align-right" iconName="utility:filterList" selected="{! v.showFilters }"  alternativeText="Settings" value="{! v.this }" size="xx-small" data-index="{!index}" />
           </span>
             <div id="{! 'filterDiv' + index }" class='search-section hidden'>
-              <div class="close-icon-wrapper" onclick="{!c.handleFilterSpanClick}" data-value="{!index}" data-columnName="{!column.name}">
+              <div class="close-icon-wrapper" onclick="{!c.handleFilterSpanClic9}" data-value="{!index}" data-columnName="{!column.name}">
                 <lightning:icon iconName="utility:close" size="xx-small" value="{! v.this }" />
               </div>
             <aura:if isTrue="{!column.type == 'STRING' || column.type == 'PHONE'}" >
@@ -42,14 +45,32 @@
                 <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
               </span>
             </aura:if>
+
             <aura:if isTrue="{!column.type == 'PICKLIST'}" >
                 <div aura:id="main-div"  class=" slds-picklist slds-dropdown-trigger slds-dropdown-trigger--click ">
      
                     
                   <!-- multiselect-->
-                <!-- end multiselect -->
+                  <!-- <ul>
+                    <div class='slds-form-element'>
+                      <div class="slds-form-element__control">
+                        <div class="slds-checkbox">
+                          <aura:iteration items="{! column.picklistValues}" var="option">
+                            <input type="checkbox" name="options" id="checkbox" value="{!option}"/>
+                            <label class="slds-checkbox__label" for="{!option}">
+                              <span class="slds-checkbox_faux"></span>
+                              <span class="slds-form-element__label">{!option}</span>
+                            </label>
+                          </aura:iteration>
+                        </div>
+                      </div>
+                    </div>
+                  </ul> -->
+                  <c:MultiSelect parent="{!this}" picklistValues="{!column.picklistValues}" label="{!column.label}" filters="{!v.columnFilters}"/>
+                </div>
+                  <!-- end multiselect -->
 
-              <div data-index="{!index}" onchange="{!c.onColumnChange}">
+              <!-- <div data-index="{!index}" onchange="{!c.onColumnChange}">
                 <lightning:select value="{!column.filterText}" aura:id="aura-pick" name="{!'select' + index}" label="{! 'Filter through ' + column.label}" >
                     <option value="">All</option>
                     <aura:iteration items="{!column.picklistValues}" var="option" >
@@ -59,8 +80,9 @@
                   <span onclick="{!c.resetColumn}" data-value="{!index}">
                     <lightning:icon class='icon' iconName="utility:refresh" size="xx-small" value="{! v.this }" />
                   </span>
-              </div>
+              </div> -->
             </aura:if>
+
             <aura:if isTrue="{!column.type == 'DATE'}" >
               <lightning:input aura:id="aura-date" class="date" type="date" name="{!'from' + index}" label="From" value="{!column.filterFromDate}" onchange="{!c.onColumnChange}" /><br/>
               <lightning:input aura:id="aura-date" class="date" type="date" name="{!'to' + index}" label="To" value="{!column.filterToDate}" onchange="{!c.onColumnChange}" />

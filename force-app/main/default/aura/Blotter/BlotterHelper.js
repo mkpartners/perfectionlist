@@ -3,6 +3,13 @@
   
     },
 
+    findInArray : function(obj, colName, val) {
+      if (obj.hasOwnProperty(colName) && obj[colName].length < 1) {
+        return false;
+      } 
+      return obj.hasOwnProperty(colName) && obj[colName].indexOf(val) == -1;
+    },
+
     sort : function(list, column, direction) {
       if (direction == 'asc' || !direction) {
         return list.sort(function(a, b) {
@@ -55,4 +62,8 @@
       }
       return true;
     },
+    
+    log : function(thing) {
+      console.log(JSON.parse(JSON.stringify(thing)));
+  }
   })
