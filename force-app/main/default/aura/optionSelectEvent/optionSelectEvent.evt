@@ -1,0 +1,3 @@
+<aura:event type='COMPONENT'>
+    <aura:attribute name='optionSelect' type='String'/>
+</aura:event>

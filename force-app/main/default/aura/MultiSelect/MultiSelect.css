@@ -1,2 +1,8 @@
-.THIS {
+.THIS .invisible {
+    /* display: none; */
+    opacity: 0;
+}
+.THIS .showing {
+    /* display: block; */
+    opacity: 1;
 }

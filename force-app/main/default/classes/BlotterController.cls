@@ -9,7 +9,7 @@ public with sharing class BlotterController {
         if ( String.isBlank( fieldsString) ){
             fieldsString = 'Id';
         }
-        String queryString = 'SELECT '+fieldsString+' FROM '+ sObjectName+' LIMIT 10';
+        String queryString = 'SELECT '+fieldsString+' FROM '+ sObjectName+' LIMIT 20';
         List<sObject> records = database.query(queryString);
         res.put('records', records);
 

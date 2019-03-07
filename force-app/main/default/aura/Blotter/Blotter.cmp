@@ -18,7 +18,7 @@
     <!-- multiselect -->
     <!-- end multiselect -->
 
------ blotter 41 -----
+----- blotter 6 -----
   <lightning:card title="{!v.cardTitle}" >
     displaying {!v.recordCount.showing} out of {!v.recordCount.total}
   <lightning:button onclick='{! c.resetColumn }'>clear</lightning:button>
@@ -34,7 +34,7 @@
             <lightning:icon class="align-right" iconName="utility:filterList" selected="{! v.showFilters }"  alternativeText="Settings" value="{! v.this }" size="xx-small" data-index="{!index}" />
           </span>
             <div id="{! 'filterDiv' + index }" class='search-section hidden'>
-              <div class="close-icon-wrapper" onclick="{!c.handleFilterSpanClic9}" data-value="{!index}" data-columnName="{!column.name}">
+              <div class="close-icon-wrapper" onclick="{!c.handleFilterSpanClick}" data-value="{!index}" data-columnName="{!column.name}">
                 <lightning:icon iconName="utility:close" size="xx-small" value="{! v.this }" />
               </div>
             <aura:if isTrue="{!column.type == 'STRING' || column.type == 'PHONE'}" >
@@ -47,7 +47,7 @@
             </aura:if>
 
             <aura:if isTrue="{!column.type == 'PICKLIST'}" >
-                <div aura:id="main-div"  class=" slds-picklist slds-dropdown-trigger slds-dropdown-trigger--click ">
+                <div aura:id="main-div"  class=" slds-picklist slds-dropdown-trigger slds-dropdown-trigger_click ">
      
                     
                   <!-- multiselect-->

@@ -91,15 +91,15 @@
     component.set('v.records', filteredRecords);
     component.set('v.recordCount.showing', filteredRecords.length);
     
-    if (event.currentTarget.dataset !== undefined) { 
-      let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
-      helper.addStyleClass(icon, 'icn');
-      if (query === undefined || query == '') {
-        helper.removeStyleClass(icon, 'icn');
-      }
-    } else { 
-      console.log('not actually defined');
-    }
+    // if (event.currentTarget.dataset !== undefined) { 
+    //   let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
+    //   helper.addStyleClass(icon, 'icn');
+    //   if (query === undefined || query == '') {
+    //     helper.removeStyleClass(icon, 'icn');
+    //   }
+    // } else { 
+    //   console.log('not actually defined');
+    // }
   },
 
   handleSettingsButtonClick: function (component, event, helper) {
@@ -169,5 +169,6 @@
 
     let icon = 'span-icon-wrapper' + event.currentTarget.dataset.value;
     helper.removeStyleClass(icon ,'icn');
-  }
+  },
+
 })
