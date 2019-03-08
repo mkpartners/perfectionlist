@@ -11,6 +11,9 @@
             ],
             "c/blotter-list": [
                 "blotterList/blotterList.js"
+            ],
+            "c/blotter-record": [
+                "blotterRecord/blotterRecord.js"
             ]
         }
     },

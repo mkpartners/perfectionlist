@@ -4,9 +4,15 @@
     },
 
     findInArray : function(obj, colName, val) {
+      if (obj.hasOwnProperty(colName)) {
+        // this.log(obj[colName]);
+      }
       if (obj.hasOwnProperty(colName) && obj[colName].length < 1) {
         return false;
       } 
+      if (obj.hasOwnProperty(colName) && val == '') {
+        return false;
+      }
       return obj.hasOwnProperty(colName) && obj[colName].indexOf(val) == -1;
     },
 
@@ -61,6 +67,14 @@
         }
       }
       return true;
+    },
+
+    safeCheck : function(obj, fieldWanted) {
+      try {
+        return obj.currentTarget.dataset[fieldWanted];
+      } catch(e) {
+        return false;
+      }
     },
     
     log : function(thing) {

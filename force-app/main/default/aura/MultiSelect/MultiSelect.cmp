@@ -6,6 +6,7 @@
     <aura:attribute name='label' type='String' />
     <aura:attribute name='parent' type='Aura.Component' required='true'/>
     <aura:attribute name='filterCount' type='String' default='No filters applied' />
+    <aura:attribute name='targetForFilter' type='Integer'/>
 
     <div class="slds-form-element">
         <label class="slds-form-element__label" for="combobox-id-17">Filter by</label>
@@ -18,13 +19,22 @@
                             id="combobox-id-17" aria-controls="listbox-id-7" autoComplete="off" role="textbox"
                             placeholder="{! v.filterCount }" readonly="" />
                         <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
-                            <!-- <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
-                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
-                    </svg> -->
                         </span>
                     </div>
                     <div id="listbox-id-7" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" role="listbox">
                         <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                            <li aura:id='list-item' role="presentation" class="slds-listbox__item">
+                                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
+                                        <div id="{! 'blank' + v.label }" class="invisible">
+                                            <span class="slds-media__figure slds-listbox__option-icon">
+                                                <lightning:icon iconName="utility:check" alternativeText='checked' size='x-small'/>
+                                            </span>
+                                        </div>
+                                        <span class="slds-media__body">
+                                            <span class="slds-truncate" title="blank" data-index="" data-label='{! v.label }' data-value="blank" onclick="{!c.pickSelect}">Blank</span>
+                                        </span>
+                                    </div>
+                                </li>
                             <aura:iteration items="{!v.picklistValues}" var="item" indexVar='i'>
                                 <li aura:id='list-item' role="presentation" class="slds-listbox__item">
                                     <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">

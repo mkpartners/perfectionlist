@@ -49,9 +49,10 @@
   onColumnChange: function (component, event, helper) {
     let columns = component.get('v.columns');
     let records = component.get('v.queriedRecords');
-    console.log('on column change is called');
     let currentFilters = component.get('v.columnFilters');
-    helper.log(currentFilters);
+    let index = helper.safeCheck(event, 'index');
+
+    // helper.log(currentFilters);
     let filteredRecords = [];
     let query, fromDate, toDate;
     for (let r in records) {
@@ -91,15 +92,16 @@
     component.set('v.records', filteredRecords);
     component.set('v.recordCount.showing', filteredRecords.length);
     
-    // if (event.currentTarget.dataset !== undefined) { 
-    //   let icon = 'span-icon-wrapper' + event.currentTarget.dataset.index;
-    //   helper.addStyleClass(icon, 'icn');
-    //   if (query === undefined || query == '') {
-    //     helper.removeStyleClass(icon, 'icn');
-    //   }
-    // } else { 
-    //   console.log('not actually defined');
-    // }
+    if (index) { 
+      let icon = 'span-icon-wrapper' + index;
+      console.log(icon);
+      helper.addStyleClass(icon, 'icn');
+      if (query === undefined || query == '') {
+        helper.removeStyleClass(icon, 'icn');
+      }
+    } else { 
+      console.log('not actually defined');
+    }
   },
 
   handleSettingsButtonClick: function (component, event, helper) {
@@ -129,46 +131,29 @@
   //trying to reset back to the queried columns and not the original list
   resetColumn: function(component, event, helper) {
     let records = component.get('v.queriedRecords');
+    
     component.set('v.records', records);
     component.set('v.recordCount.showing', records.length);
-    // let columns = component.get('v.columns');
-
+    
     let inputs = component.find('aura-input');
-    let inputSearch = 'inputSearch' + event.currentTarget.dataset.value;
-    inputs.forEach(input => {
-      if (input.get('v.id') == inputSearch) {
-        input.set('v.value', '');
-      }
-    })
-
+    inputs.forEach(input => input.set('v.value', ''))
+    
     component.set('v.columnFilters', {});
-
     let picks = component.find('aura-pick');
-    let targetPick = 'select' + event.currentTarget.dataset.value;
-    if (picks.length > 0) {
-      picks.forEach(pick => {
-        if (pick.get('v.name') == targetPick) {
-          pick.set('v.value', '');
-        }
-      })
+    if (picks != undefined && Array.isArray(picks)) {
+      picks.forEach(pick => pick.set('v.value', ''))
     }
+
+    let multis = component.find('multi-select');
+    multis.forEach(multi => multi.set('v.filterCount', 'No filter applied'));
 
     let dates = component.find('aura-date');
-    let dateFrom = 'from' + event.currentTarget.dataset.value;
-    let dateTo = 'to' + event.currentTarget.dataset.value;
-    if (dates.length > 0) {
-      dates.forEach(date => {
-        if (date.get('v.name') == dateTo) {
-          date.set('v.value', '');
-        }
-        if (date.get('v.name') == dateFrom) {
-          date.set('v.value', '');
-        }
-      })
+    if (dates != undefined && Array.isArray(dates)) {
+      dates.forEach(date => date.set('v.value', ''))
     }
-
-    let icon = 'span-icon-wrapper' + event.currentTarget.dataset.value;
-    helper.removeStyleClass(icon ,'icn');
+    for (let i = 0; i < 6; i++) {
+      helper.removeStyleClass('span-icon-wrapper' + i, 'icn');
+    }
   },
 
 })

@@ -18,7 +18,7 @@
     <!-- multiselect -->
     <!-- end multiselect -->
 
------ blotter 6 -----
+----- blotter 43 -----
   <lightning:card title="{!v.cardTitle}" >
     displaying {!v.recordCount.showing} out of {!v.recordCount.total}
   <lightning:button onclick='{! c.resetColumn }'>clear</lightning:button>
@@ -48,27 +48,8 @@
 
             <aura:if isTrue="{!column.type == 'PICKLIST'}" >
                 <div aura:id="main-div"  class=" slds-picklist slds-dropdown-trigger slds-dropdown-trigger_click ">
-     
-                    
-                  <!-- multiselect-->
-                  <!-- <ul>
-                    <div class='slds-form-element'>
-                      <div class="slds-form-element__control">
-                        <div class="slds-checkbox">
-                          <aura:iteration items="{! column.picklistValues}" var="option">
-                            <input type="checkbox" name="options" id="checkbox" value="{!option}"/>
-                            <label class="slds-checkbox__label" for="{!option}">
-                              <span class="slds-checkbox_faux"></span>
-                              <span class="slds-form-element__label">{!option}</span>
-                            </label>
-                          </aura:iteration>
-                        </div>
-                      </div>
-                    </div>
-                  </ul> -->
-                  <c:MultiSelect parent="{!this}" picklistValues="{!column.picklistValues}" label="{!column.label}" filters="{!v.columnFilters}"/>
+                  <c:MultiSelect aura:id='multi-select' parent="{!this}" picklistValues="{!column.picklistValues}" label="{!column.label}" filters="{!v.columnFilters}" targetForFilter="{!index}"/>
                 </div>
-                  <!-- end multiselect -->
 
               <!-- <div data-index="{!index}" onchange="{!c.onColumnChange}">
                 <lightning:select value="{!column.filterText}" aura:id="aura-pick" name="{!'select' + index}" label="{! 'Filter through ' + column.label}" >
@@ -109,7 +90,15 @@
           <div class="slds-grid slds-box slds-box_xx-small row striped-row" id="{!index % 2 != 0 ? 'row' : ''}">
             <aura:iteration items="{!v.columns}" var="column" >
               <div class="{!'slds-col cell slds-size_1-of-'+v.columns.length}">
-                <lightning:outputField fieldName="{!column.name}" variant="label-hidden" />
+                <!-- <a href="{! column.label == v.sObjectName + ' Name' ? '/lightning/r/' + v.sObjectName + '/' + record.Id + '/view' : ''}"><lightning:outputField fieldName="{!column.name}" variant="label-hidden" /></a> -->
+                
+                <aura:if isTrue="{! v.sObjectName + ' Name' == column.label }">
+                  <a href="{!'/lightning/r/' + v.sObjectName + '/' + record.Id + '/view'}"><lightning:outputField  class='link' fieldName="{!column.name}" variant="label-hidden" /></a>
+                </aura:if>
+                <aura:if isTrue="{! v.sObjectName + ' Name' != column.label }">
+                  <lightning:outputField fieldName="{!column.name}" variant="label-hidden" />
+                </aura:if>
+                  <!-- :<lightning:outputField fieldName="{!column.name}" variant="label-hidden" /> -->
               </div>
             </aura:iteration>
           </div>

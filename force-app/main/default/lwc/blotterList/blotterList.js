@@ -16,14 +16,14 @@ export default class BlotterList extends LightningElement {
     @track select;
 
     connectedCallback() {
-        console.log(new Date().getTimezoneOffset())
+        // console.log(new Date().getTimezoneOffset())
 
         initBlotter({sObjectName: this.objectType, fieldsString: this.fields})
             .then((result) => {
                 this.records = result.records;
                 this.columns = result.columns;
-                console.log(JSON.parse(JSON.stringify(this.records)))
-                console.log(JSON.parse(JSON.stringify(this.columns)))
+                // console.log(JSON.parse(JSON.stringify(this.records)))
+                // console.log(JSON.parse(JSON.stringify(this.columns)))
             })
             .catch((error) => {this.error = error})
     }

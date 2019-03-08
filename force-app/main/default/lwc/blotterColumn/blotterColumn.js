@@ -8,7 +8,7 @@ export default class BlotterColumn extends LightningElement {
     @track filterToDate;
 
     connectedCallback() {
-        console.log(this.column);
+        // console.log(this.column);
     }
 
     columnChange(event) {
@@ -56,8 +56,7 @@ export default class BlotterColumn extends LightningElement {
     log(x) {
         if (x.length > 0) {
             x.forEach(y => this.log(y))
-        } else {
-            console.log(JSON.parse(JSON.stringify(x)));
-        }
+        } 
+        console.log(JSON.parse(JSON.stringify(x)));
     }
 }
