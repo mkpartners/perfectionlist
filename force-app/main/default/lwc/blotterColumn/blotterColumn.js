@@ -22,6 +22,16 @@ export default class BlotterColumn extends LightningElement {
 
     handleSort(event) {
         let columnToSortBy = event.currentTarget.dataset.column;
+        //need to check if the query object has one with this column name
+        console.log(this.query.hasOwnProperty(columnToSortBy))
+        //and if it does then we need to check the sort order
+        //then we can reassign the sort order if we need to
+        let direction = 'this.whatDirection(this.query[columnToSortBy].sortOrder);'
+        console.log(direction);
+        this.query = {[columnToSortBy]: { value: '', sortOrder: direction} };
+        console.log('from the query', this.query[columnToSortBy].sortOrder)
+        this.dispatchEvent(new CustomEvent('query', { bubbles: true, detail: this.query }))
+
         this.dispatchEvent(new CustomEvent('sort', { bubbles: true, detail: columnToSortBy }));
     }
 
@@ -58,6 +68,17 @@ export default class BlotterColumn extends LightningElement {
         this.columnChange(event);
     }
 
+    whatDirection(dir) {
+        console.log('calling what direction');
+        console.log(dir)
+        if (dir !== undefined) {
+            console.log('making an assignment');
+            return dir === 'asc' ? 'dsc' : 'asc';
+        }
+        console.log('ok didnt get into the if')
+        return 'asc';
+    }
+
     get pickOptions() {
         return this.column.picklistValues ? this.column.picklistValues.map(c => ({name: c, value: c, label: c})) : '';
     }
@@ -81,7 +102,7 @@ export default class BlotterColumn extends LightningElement {
     get lightningIcon() {
         //something will go here to dynamically set which icon we should render
         if (this.query.hasOwnProperty(this.columnName)) {
-            this.query[this.columnName].sortOrder = 'asc' ? 'utility:chevronup' : 'utility:chevrondown';
+            this.query[this.columnName].sortOrder === 'asc' ? 'utility:chevronup' : 'utility:chevrondown';
         }
         return 'utility:sort';
     }
