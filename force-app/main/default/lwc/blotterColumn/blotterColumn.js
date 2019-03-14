@@ -2,13 +2,17 @@ import { LightningElement, api, track } from 'lwc';
 
 export default class BlotterColumn extends LightningElement {
     @api column;
-    @track query;
+    @track query = {};
+    @track queryString = '';
     @track select;
+    @track selectString = '';
     @track filterFromDate;
     @track filterToDate;
+    @track filterToDateString = '';
+    @track columnName;
 
     connectedCallback() {
-        // console.log(this.column);
+        this.columnName = this.column.name;
     }
 
     columnChange(event) {
@@ -16,20 +20,41 @@ export default class BlotterColumn extends LightningElement {
         this.dispatchEvent(new CustomEvent('column'))
     }
 
-    handleDate(event) {
-        console.log(event.currentTarget.value)
+    handleSort(event) {
+        let columnToSortBy = event.currentTarget.dataset.column;
+        this.dispatchEvent(new CustomEvent('sort', { bubbles: true, detail: columnToSortBy }));
     }
+
 
     handleQuery(event) {
         // grab the query from the input and dispatch it as an event up to the parent component to handle the filtering of records
-        this.query = event.currentTarget.value;
+        this.queryString = event.currentTarget.value;
+        this.query = {[this.columnName]: { value: event.currentTarget.value, sortOrder: ''} };
+
         this.dispatchEvent(new CustomEvent('query', { bubbles: true, detail: this.query }));
         this.columnChange(event);
     }
 
     handleSelect(event) {
-        this.select = event.detail.value;
+        this.select = {[this.columnName]: { value: event.currentTarget.value, sortOrder: ''} };
+        this.selectString = event.currentTarget.value;
         this.dispatchEvent(new CustomEvent('select', { bubbles: true, detail: this.select }));
+        this.columnChange(event);
+    }
+
+    handleToDate(event) {
+        console.log('handling the date');
+        this.filterToDate = {toDate: { value: event.currentTarget.value, sortOrder: ''} };
+        this.filterToDateString = event.currentTarget.value;
+        this.dispatchEvent(new CustomEvent('date', { bubbles: true, detail: this.filterToDate }));
+        this.columnChange(event);
+    }
+
+    handleFromDate(event) {
+        console.log('handling the date');
+        this.filterFromDate = {fromDate: { value: event.currentTarget.value, sortOrder: ''} };
+        this.filterToDateString = event.currentTarget.value;
+        this.dispatchEvent(new CustomEvent('date', { bubbles: true, detail: this.filterFromDate }));
         this.columnChange(event);
     }
 
@@ -51,6 +76,14 @@ export default class BlotterColumn extends LightningElement {
 
     get isDate() {
         return this.column.type === 'DATE';
+    }
+
+    get lightningIcon() {
+        //something will go here to dynamically set which icon we should render
+        if (this.query.hasOwnProperty(this.columnName)) {
+            this.query[this.columnName].sortOrder = 'asc' ? 'utility:chevronup' : 'utility:chevrondown';
+        }
+        return 'utility:sort';
     }
 
     log(x) {

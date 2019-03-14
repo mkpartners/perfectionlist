@@ -2,9 +2,8 @@
     <lightning-card title='Blotter 1'>
         <div id="headers" class="slds-grid slds-box slds-box_xx-small slds-table_col-bordered row-header row">
             <template for:each={columns} for:item="column" iterator:value={index}>
-               <c-blotter-column column={column} query={query} key={column.Id} index={index} onquery={handleQuery} onselect={handleSelect} oncolumn={columnChange}></c-blotter-column>
+               <c-blotter-column column={column} query={query} key={column.Id} index={index} onquery={handleQuery} onselect={handleSelect} ondate={handleDate} oncolumn={columnChange} onsort={handleSort}></c-blotter-column>
             </template>
-            <button onclick={alphabetize}>alskdfjkla</button>
         </div>
         
         

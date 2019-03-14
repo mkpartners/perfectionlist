@@ -12,55 +12,67 @@ export default class BlotterList extends LightningElement {
     @track records;
     @track columns;
     @track error;
-    @track query = '';
+    @track query = {};
     @track select;
+    @track filterDate;
+    @track queriedRecords;
 
     connectedCallback() {
-        // console.log(new Date().getTimezoneOffset())
-
         initBlotter({sObjectName: this.objectType, fieldsString: this.fields})
             .then((result) => {
                 this.records = result.records;
                 this.columns = result.columns;
-                // console.log(JSON.parse(JSON.stringify(this.records)))
-                // console.log(JSON.parse(JSON.stringify(this.columns)))
+                this.queriedRecords = result.records;
             })
             .catch((error) => {this.error = error})
     }
 
     handleQuery(event) {
-        // this receives the query from the column and sets the query on this state forcing a page rerender
-        this.query = event.detail;
-        console.log(this.query);
+        // we take in the data from the event and use the spread to create a state of filters we are going to use when sorting and alphabetizing
+        this.query = {...this.query, ...event.detail};
     }
 
     handleSelect(event) {
-        this.select = event.detail;
-        console.log(this.select);
+        // similar to the handle query, we are creating an object of any filters we are going to be applying
+        this.select = {...this.select, ...event.detail};
+    }
+
+    handleDate(event) {
+        console.log('received event to date');
+        this.filterDate = {...this.filterDate, ...event.detail};
+        console.log(this.filterDate);
+    }
+
+    handleSort(event) {
+        console.log(event.detail)
+        let newRecords = this.records.filter((a) => {
+            return a[event.detail] !== 'Edge Communications';
+        })
+
+        console.log(newRecords);
+        this.records = newRecords;
     }
 
     columnChange(event) {
         console.log('column change event fired');
+        console.log('line 46')
+        if (this.query != null) {
+            // do some sorting of the records
+            // console.log(this.query.name)
+        }
+        if (this.select != null) {
+            // console.log(this.select)
+        }
+
+
     }
 
     get shouldRender() {
         return this.records && this.columns;
     }
-
-    // onclick methods
-    alphabetize(event) {
-        console.log('trying to alphabetizer');
-        console.log(this.query)
-    }
-
     // css methods
     get columnHeaderClass() {
         return `slds-col cell slds-size_1-of-${this.columns.length}`;
-    }
-
-    get lightningIcon() {
-        //something will go here to dynamically set which icon we should render
-        return Math.random() * 100 > 50 ? 'utility:filter' : 'utility:flow';
     }
 
     log(json) {
