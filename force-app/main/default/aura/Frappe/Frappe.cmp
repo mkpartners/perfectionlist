@@ -1,0 +1,14 @@
+<aura:component controller="FrappeController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+
+  <ltng:require
+    styles="{!$Resource.frappe + '/frappe/frappe.datatable.min.css'}"
+    scripts="{!join(',', 
+      $Resource.frappe + '/frappe/clusterize.min.js',
+      $Resource.frappe + '/frappe/sortable.min.js',
+      $Resource.frappe + '/frappe/frappe.datatable.min.js'
+    )}"
+    afterScriptsLoaded="{!c.scriptsLoaded}"
+  />
+  
+  <div aura:id='frappe-table'></div>
+</aura:component>

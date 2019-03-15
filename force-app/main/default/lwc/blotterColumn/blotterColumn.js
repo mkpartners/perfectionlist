@@ -25,7 +25,10 @@ export default class BlotterColumn extends LightningElement {
         //need to check if the query object has one with this column name
         console.log(this.query.hasOwnProperty(columnToSortBy))
         //and if it does then we need to check the sort order
-        //then we can reassign the sort order if we need to
+        //then we can reassign the sort order if we need to''
+        if (this.query.hasOwnProperty(columnToSortBy)) {
+            let direction = this.whatDirection(this.query[columnToSortBy])
+        }
         let direction = 'this.whatDirection(this.query[columnToSortBy].sortOrder);'
         console.log(direction);
         this.query = {[columnToSortBy]: { value: '', sortOrder: direction} };
