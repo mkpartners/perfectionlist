@@ -1,14 +1,21 @@
-<aura:component controller="FrappeController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+<aura:component controller="BlotterController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name='sObjectName' type='String' default='Account' />
+    <aura:attribute name="fields" type="String" description="Comma Separated List" default="Name,Type,Industry,Phone,BillingState,LastModifiedDate" />
+    <aura:attribute name="columns" type="List" />
+    <aura:attribute name="queriedRecords" type="List" />
+    <aura:attribute name="records" type="List" />
+
+    <aura:handler name='init' value="{!this}" action="{!c.init}"/>
 
   <ltng:require
     styles="{!$Resource.frappe + '/frappe/frappe.datatable.min.css'}"
     scripts="{!join(',', 
-      $Resource.frappe + '/frappe/clusterize.min.js',
-      $Resource.frappe + '/frappe/sortable.min.js',
-      $Resource.frappe + '/frappe/frappe.datatable.min.js'
-    )}"
-    afterScriptsLoaded="{!c.scriptsLoaded}"
+             $Resource.frappe + '/frappe/clusterize.min.js',
+             $Resource.frappe + '/frappe/sortable.min.js', 
+             $Resource.frappe + '/frappe/frappe.datatable.min.js'
+             )}"
   />
   
-  <div aura:id='frappe-table'></div>
+  <div aura:id='frappe'></div>
+  hello
 </aura:component>

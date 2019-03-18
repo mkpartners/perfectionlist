@@ -14,9 +14,6 @@
             ],
             "c/blotter-record": [
                 "blotterRecord/blotterRecord.js"
-            ],
-            "c/table": [
-                "table/table.js"
             ]
         }
     },
