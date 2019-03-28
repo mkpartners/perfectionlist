@@ -1,4 +1,5 @@
 <aura:component controller="BlotterController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name='title' type='String' default='Blotter' />
     <aura:attribute name='sObjectName' type='String' default='Account' />
     <aura:attribute name="fields" type="String" description="Comma Separated List" default="Name,Type,Industry,Phone,BillingState,LastModifiedDate" />
     <aura:attribute name="columns" type="List" />
@@ -15,7 +16,15 @@
              $Resource.frappe + '/frappe/frappe.datatable.min.js'
              )}"
   />
-  
-  <div aura:id='frappe'></div>
-  hello
+  <lightning:card>
+    <aura:set attribute='title'>
+      <lightning:icon iconName='custom:custom51' size='medium'/>
+        &emsp;{! v.title }
+    </aura:set>
+    <aura:set attribute='footer'>
+    </aura:set>
+    <div id='frappe' aura:id='frappe'></div>
+
+    {!v.body}
+  </lightning:card>
 </aura:component>

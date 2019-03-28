@@ -33,35 +33,64 @@
     },
     
     constructTable : function(component, event, helper) {
-        var element = component.find('frappe');
-        container = element.elements[0];
+        let element = component.find('frappe');
+        let container = element.elements[0];
         
         let columns = component.get('v.columns')
-        console.log(columns)
         let records = component.get('v.records');
-        console.log(records);
 
-        let cols = helper.map(function(col) {
-            return col.label
-        })
-        console.log(cols)
-        
+        let cols = [];
+        for (let i = 0; i < columns.length; i++) {
+            let temp = {}
+            temp.name = columns[i].name;
+            if (columns[i].name == 'LastModifiedDate') {
+                temp.format = function(value) {
+                    let date = new Date(value).toLocaleString();
+                    return date;
+                }
+            }
+
+            cols.push(temp)
+        }
+
+        let recs = [];
+        for (let i = 0; i < records.length; i++) {
+            recs.push(records[i]);
+        }
+
+        console.log(recs);
         let table = new DataTable(container, {
             columns: cols,
-            data: [
-				['angelo', 53],
-                ['ben', 824],
-                ['luigi', 35],
-                ['yiyan', 24],
-                ['alex', 26],
-                ['jason', 3893],
-                ['hello', 829489],
-                ['tomato', 24892],
-                ['tilted', 82948],
-                ['risky', 8248924],
-                ['shifty', 24982],
-                ['greasy', 284]
-            ]
+            data: recs,
+            inlineFilters: true,
+            serialNoColumn: true,
+            layout: 'fluid'
         })
+
+        $A.createComponent(
+            'lightning:button',
+            {
+                'aura:id': 'exportToExcel',
+                'label': 'Export to XLSX',
+                'onclick': component.getReference('c.handlePress')
+            },
+            function(newButton, status, errorMessage) {
+                if (status === 'SUCCESS') {
+                    var body = component.get('v.body');
+                    body.push(newButton);
+                    component.set('v.body', body)
+                } else if (status == 'INCOMPLETE') {
+                    console.log('no response from server or client is offline')
+                } else if (status == 'ERROR') {
+                    console.log('error: ' + errorMessage)
+                }
+            }
+        )
+    },
+    
+    handlePress : function(cmp) {
+        console.log('button: ' + cmp.find('exportToExcel'));
+        console.log('buton has been press')
     }
+
 })
