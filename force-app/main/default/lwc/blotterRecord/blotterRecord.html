@@ -1,11 +1,15 @@
 <template>
     <lightning-record-view-form record-id={record.Id} object-api-name='Account'>
-        <div class="slds-grid slds-box slds-box_xx-small row striped-row">
+        <div class="slds-grid row striped-row">
             <template for:each={columns} for:item='column' iterator:value={index}>
-                <div key={index} class='slds-col cell slds-size_1-of-6'>
-                    <lightning-output-field field-name={column.name} variant='label-hidden'></lightning-output-field>
+                <div key={index} class='slds-size_1-of-6'>
+                    <lightning-output-field key={index} field-name={column.name} variant='label-hidden'>
+                    </lightning-output-field>
+                    {ky}
                 </div>
             </template>
         </div>
     </lightning-record-view-form>
-</template>
+</template> 
+<!-- slds-box slds-box_xx-small  -->
+<!-- slds-col cell  -->

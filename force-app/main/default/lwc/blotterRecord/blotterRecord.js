@@ -5,7 +5,6 @@ export default class BlotterRecord extends LightningElement {
     @api columns;
 
     connectedCallback() {
-        // this.log(this.record);
     }
 
     get url() {

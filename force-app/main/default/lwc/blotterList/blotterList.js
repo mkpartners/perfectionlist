@@ -47,12 +47,17 @@ export default class BlotterList extends LightningElement {
         console.log('received an event')
         // this.query = {...this.query, ...event.detail };
         console.log('49', event.detail)
-        console.log(this.query[event.detail].sortOrder)
+        this.log(this.query)
 
         // let's check if the column exists in the state
-        // if (this.query.hasOwnProperty(event.detail.column)) {
-        //     console.log('i exist');
-        // }
+        if (this.query.hasOwnProperty(event.detail)) {
+            console.log('i exist');
+            let recs = this.records;
+            this.records = recs.sort((a, b) => a[event.detail] - b[event.detail]);
+            console.log(recs);
+        } else {
+            console.log('something is up here');
+        }
 
         // let newRecords = this.records.filter((a) => {
         //     return a[event.detail.column] !== 'Edge Communications';
@@ -72,8 +77,6 @@ export default class BlotterList extends LightningElement {
         if (this.select != null) {
             // console.log(this.select)
         }
-
-
     }
 
     get shouldRender() {
