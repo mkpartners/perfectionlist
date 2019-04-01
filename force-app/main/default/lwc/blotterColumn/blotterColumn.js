@@ -43,7 +43,7 @@ export default class BlotterColumn extends LightningElement {
         // grab the query from the input and dispatch it as an event up to the parent component to handle the filtering of records
         this.queryString = event.currentTarget.value;
         this.query = {[this.columnName]: { value: event.currentTarget.value, sortOrder: ''} };
-
+        console.log(this.query);
         this.dispatchEvent(new CustomEvent('query', { bubbles: true, detail: this.query }));
         this.columnChange(event);
     }
@@ -105,7 +105,7 @@ export default class BlotterColumn extends LightningElement {
     get lightningIcon() {
         //something will go here to dynamically set which icon we should render
         if (this.query.hasOwnProperty(this.columnName)) {
-            this.query[this.columnName].sortOrder === 'asc' ? 'utility:chevronup' : 'utility:chevrondown';
+            return this.query[this.columnName].sortOrder === 'asc' ? 'utility:chevronup' : 'utility:chevrondown';
         }
         return 'utility:sort';
     }

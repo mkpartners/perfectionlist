@@ -20,6 +20,7 @@ export default class BlotterList extends LightningElement {
     connectedCallback() {
         initBlotter({sObjectName: this.objectType, fieldsString: this.fields})
             .then((result) => {
+                console.log('connected callback');
                 this.records = result.records;
                 this.columns = result.columns;
                 this.queriedRecords = result.records;
@@ -30,6 +31,8 @@ export default class BlotterList extends LightningElement {
     handleQuery(event) {
         // we take in the data from the event and use the spread to create a state of filters we are going to use when sorting and alphabetizing
         this.query = {...this.query, ...event.detail};
+        console.log(this.query);
+
     }
 
     handleSelect(event) {

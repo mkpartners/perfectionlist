@@ -1,0 +1,33 @@
+=== Test Reports
+FORMAT  FILE
+──────  ────────────────────────────────────────────────────────────────────────────────────────────
+txt     /home/achagoy/blotterTest/.sfdx/tools/testresults/apex/test-result.txt
+txt     /home/achagoy/blotterTest/.sfdx/tools/testresults/apex/test-run-id.txt
+junit   /home/achagoy/blotterTest/.sfdx/tools/testresults/apex/test-result-707B0000016IWIV-junit.xml
+json    /home/achagoy/blotterTest/.sfdx/tools/testresults/apex/test-result-707B0000016IWIV.json
+
+=== Test Results
+TEST NAME                                 OUTCOME  MESSAGE                                                            RUNTIME (MS)
+────────────────────────────────────────  ───────  ─────────────────────────────────────────────────────────────────  ────────────
+AccountServiceTest.should_create_account  Fail     Methods defined as TestMethod do not support Web service callouts  2620
+
+=== Test Summary
+NAME                 VALUE
+───────────────────  ───────────────────────────────────────────
+Outcome              Failed
+Tests Ran            1
+Passing              0
+Failing              1
+Skipped              0
+Pass Rate            0%
+Fail Rate            100%
+Test Start Time      Apr 1, 2019 2:57 PM
+Test Execution Time  2620 ms
+Test Total Time      2620 ms
+Command Time         6627 ms
+Hostname             https://chagoy-mk-dev-ed.my.salesforce.com
+Org Id               00DB0000000EaaQMAS
+Username             achagoy-a5r9@force.com
+Test Run Id          707B0000016IWIV
+User Id              005B0000004uZnnIAE
+
