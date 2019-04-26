@@ -1,0 +1,89 @@
+<template>
+    
+    <lightning-card title={cardTitle} icon-name={iconName}>
+        
+        <!-- version -->
+        <strong class="slds-m-horizontal_medium">{version}</strong>
+        <strong class="slds-m-horizontal_medium">Displaying: {recordCount.showing} out of {recordCount.total}</strong>
+
+        <!-- Searchbox -->
+        <lightning-input if:true={columns}
+                        onchange={searchColumns}
+                        type="search"
+                        class={searchBoxWidth}
+                        variant="label-hidden"
+                        placeholder={searchPlaceHolder}
+                        value={filterText}>
+
+        </lightning-input>
+        <!-- THs -->
+        <div class="slds-grid slds-box 
+                    slds-box_xx-small 
+                    slds-m-horizontal_small
+                    slds-table_col-bordered 
+                    row-header">
+            <template if:true={columns} for:each={columns} for:item='column' for:index='index'>
+    
+                <div key={column} class={columnGridLength}>
+    
+                    <strong class="slds-text-title_caps">
+                        {column.label}
+                        <lightning-icon icon-name={column.iconName}
+                                        data-value={column.name}
+                                        data-index={index}
+                                        onclick={alphabetize}
+                                        size="xx-small"></lightning-icon>
+                    </strong>
+
+                    <!-- col filters -->
+                    
+                    <template if:true={colsAreStringsOrPhones}>
+                      <lightning-input value={column.FilterText} key={column} class="max_width">
+                    
+                      </lightning-input>
+                    
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <!-- TD's -->
+        <div class="row slds-m-horizontal_small">
+            <template if:true={records} for:each={records} for:item="record">
+
+                <lightning-record-view-form record-id={record.Id} 
+                                            object-api-name={sObjectName}
+                                            key={record}>
+                    <div class="slds-grid 
+                                slds-box 
+                                slds-box_xx-small 
+                                row striped-row">
+                        <template iterator:it={columns}>
+                            <div key={it.value.Id} class={columnGridLength}/>
+                                <a if:true={it.first}
+                                    target="blank"
+                                    class="slds-text-link"
+                                    href={record.link}>
+                                    {record.Name}
+                                </a>
+                                <lightning-output-field if:false={it.first}
+                                                        class="slds-m-left-small"
+                                                        field-name={it.value.name}
+                                                        variant="label-hidden">
+                                </lightning-output-field>
+                            </div>
+
+                        </template>
+                    </div>
+
+
+                </lightning-record-view-form>
+                
+            </template>
+
+        </div>
+
+
+    </lightning-card>    
+    
+</template>
