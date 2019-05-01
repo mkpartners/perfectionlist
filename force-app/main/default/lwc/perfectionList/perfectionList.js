@@ -3,6 +3,7 @@ import { LightningElement, api, track } from 'lwc';
 import initPFList from '@salesforce/apex/PerfectionListController.initPFList';
 
 export default class PerfectionList extends LightningElement {
+
   // Attributes passed in to the Component by the Page
   @api recordId;  //RecordId if renderd on a Record's Page
   @api cardTitle;
@@ -18,7 +19,6 @@ export default class PerfectionList extends LightningElement {
   @track filterText = ''; // global search
   @track records; // array of original records returned from the DB
 
-  _filteredRecords; // array of only the records being displayed
   @track showFilters; // boolean
 
   @track colsAreStringsOrPhones = true;
@@ -36,7 +36,12 @@ export default class PerfectionList extends LightningElement {
   };
 
   @track error;
-  version = 'PerfectionList 0.1.4.10 made with <3 by MK Partners, Inc.';
+
+  // Private variables
+  version = 'PerfectionList 0.1.4.11 made with <3 by MK Partners, Inc.';
+  _filteredRecords; // array of only the records being displayed
+
+
 
   get rowsDivClassName(){
     let name = 'row slds-m-horizontal_small';
@@ -213,64 +218,59 @@ export default class PerfectionList extends LightningElement {
       let recordMatchesColumnFilter= true;
       for ( let c=0; c<columnList.length; c++ ){
         let column = columnList[c];
-        // this.log( column );
-        let fieldValue = record[column.name];
+
+        //Check the Search Value
         let matchesSearch = true;
-        if ( undefined !== globalSearchString && null != globalSearchString && globalSearchString.length > 0 ){
-          matchesSearch = this.passesSearch(fieldValue, globalSearchString);
+        if ( this.isNotBlank(globalSearchString ) ){
+          matchesSearch = this.passesFilter( record, column, globalSearchString );
         }
-        if ( matchesSearch ){
+        if ( matchesSearch === true ){
           recordMatchesSearch = true;
         }
+
+        //Check the Column Filter Value
         let matchesColumnFilter = true;
-        if ( undefined !== column.filterText && null != column.filterText && column.filterText.length > 0 ){
-          matchesColumnFilter = this.passesColumnFilter( record, column);
+        if ( this.isNotBlank(column.filterText) ){
+          matchesColumnFilter = this.passesFilter( record, column, null);
         }
         if ( matchesColumnFilter === false ){
           recordMatchesColumnFilter = false;
         }
-        // this.log( recordMatchesColumnFilter );
       }
-      // this.log( {"recordMatchesSearch": recordMatchesSearch, "recordMatchesColumnFilter": recordMatchesColumnFilter} );
       if ( recordMatchesSearch && recordMatchesColumnFilter ){
+        this.log( {"recordMatchesSearch": recordMatchesSearch, "recordMatchesColumnFilter": recordMatchesColumnFilter} );
         filteredList.push(record);
       }
     }
-    // return filteredList;
+    this.recordCount.showing = filteredList.length;
     this._filteredRecords = filteredList;
   }
 
-  passesSearch(fieldValue, globalSearchString){
-    let matchesGlobalSearchString = false;
-    if ( null === globalSearchString || globalSearchString.length === 0 ){
-      matchesGlobalSearchString = true;
-    } else {
-      matchesGlobalSearchString = this.containsString(globalSearchString, fieldValue);
-    }
-    return matchesGlobalSearchString;
+  isNotBlank(textValue){
+    return (undefined !== textValue && null != textValue && textValue.length > 0);
   }
 
-  passesColumnFilter(record, column){
+  passesFilter(record, column, searchString){
     let fieldValue = record[column.name];
-    let matchesColumnFilter = false;
-    if ( null != column.filterText && (column.displayType === 'STRING' || column.displayType === 'PHONE') ){
-      matchesColumnFilter = this.containsString(column.filterText, fieldValue);
-      // this.log( {'matchesColumnFilter': matchesColumnFilter} );
+    let matchesFilter = false;
+    if ( null === searchString ){
+      searchString = column.filterText;
+    }
+    if ( column.displayType === 'STRING' || column.displayType === 'EMAIL' || column.displayType === 'PHONE' ){
+      matchesFilter = this.containsString(searchString, fieldValue);
     } 
     else if ( column.displayType === 'REFERENCE' ){
       fieldValue = record;
       let parts = column.relatedRecordFieldName.split('.');
       for ( let p=0; p<parts.length; p++ ){
-        this.log(fieldValue);
-        this.log(parts[p]);
         if ( fieldValue.hasOwnProperty(parts[p]) ){
           fieldValue = fieldValue[parts[p]];
         }
       }
-      this.log( column.filterText );
+      this.log( searchString );
       this.log( fieldValue );
       if ( typeof fieldValue !== 'object' && typeof fieldValue !== 'undefined' ){
-        matchesColumnFilter = this.containsString(column.filterText, fieldValue);
+        matchesFilter = this.containsString(searchString, fieldValue);
       }
     }
     // else if ( column.displayType === 'DATE' ){
@@ -285,9 +285,10 @@ export default class PerfectionList extends LightningElement {
     //   //column.fromDate
     // }
     else {
-      matchesColumnFilter = true;
+      matchesFilter = true;
     }
-    return matchesColumnFilter;
+    this.log( column.displayType+' '+column.name+' '+matchesFilter );
+    return matchesFilter;
   }
 
   containsString(searchingFor, searchingIn){
@@ -307,71 +308,10 @@ export default class PerfectionList extends LightningElement {
     return doesContainString;
   }
 
-  // global search
-  searchColumns(event) {
-
-    this.filterText = event.target.value;
-    let records = this.records;
-    let recordsToKeep = [];
-
-    for (let r = 0; r < records.length; r++) {
-
-      let record = this.records[r];
-      let keep = false;
-
-      for (let i = 0; i < this.columns.length; i++) {
-
-        let col = this.columns[i];
-        let val = record[col.name] ? record[col.name].toString() : '';
-
-        if (
-            col.type === 'STRING' 
-            && val.toLowerCase().startsWith(this.filterText.toLowerCase())
-        ) {
-          keep = true;
-        }
-        else if (
-          col.type === 'PHONE' 
-          && val.includes(this.filterText)
-        ) {
-          keep = true;
-        }
-        // else if (col.type === 'PICKLIST' && helper.findInArray(this.columnFilters, colName, val)) {
-
-        //     keep = false;
-        // }
-        else if (
-          (col.type === 'DATE' || col.type === 'DATETIME') 
-                && null !== col.filterFromDate 
-                && '' !== col.filterFromDate 
-                && col.filterFromDate > val
-        ) {
-
-          keep = true;
-        }
-        else if (
-          (col.type === 'DATE' || col.type === 'DATETIME') 
-                && null !== col.filterToDate 
-                && '' !== col.filterToDate 
-                && col.filterToDate < val
-        ) {
-          keep = true;
-        }
-      }
-
-      if (keep) {
-        recordsToKeep.push(this.records[r]);
-        this.filteredRecords = recordsToKeep;
-      }
-    }
-
-    this.recordCount.showing = recordsToKeep.length;
-  }
-
   log(obj) {
     let string = JSON.stringify(obj);
     let retObj = (string !== undefined) ? JSON.parse(string) : obj;
-    console.log(retObj);
+    // console.log(retObj);
   }
 
 }

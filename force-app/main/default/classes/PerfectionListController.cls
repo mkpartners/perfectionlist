@@ -139,7 +139,7 @@ public class PerfectionListController {
           //If not a Task, Case, or Event
           String relatedRecordFieldName = dfr.getName();
           if ( relatedRecordFieldName.endsWith('__c') ){
-            relatedRecordFieldName.replace('__c','__r');
+            relatedRecordFieldName = relatedRecordFieldName.replace('__c','__r');
           } 
           else if( relatedRecordFieldName.endsWith('Id') ){
             relatedRecordFieldName = relatedRecordFieldName.subStringBeforeLast('Id');
