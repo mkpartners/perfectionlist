@@ -1,0 +1,36 @@
+.overflow {
+    overflow: scroll;
+}
+
+a.link {
+    color: rgb(0, 109, 204) !important;
+    text-decoration: underline !important;
+    transition: color .1s linear !important;
+    background-color: transparent !important;
+}
+a.link:hover {
+    color:red;
+}
+.slds-icon-utility-arrowdown {
+    fill: blue;
+}
+.slds-icon-utility-arrowup {
+    fill: blue;
+}
+.lightgray {
+    color: #fcfcfc;
+}
+
+.row {
+    border-radius: 0 !important;
+    border-top: 0 !important;
+}
+
+.row-header {
+    background: #f3f2f2;
+    border-radius: 0 !important;
+}
+
+:host .max_width {
+  max-width: 170px;
+}
