@@ -22,7 +22,7 @@ export default class PerfectionList extends LightningElement {
   @track showFilters; // boolean
 
   @track colsAreStringsOrPhones = true;
-  @track fields; // array of field names
+  // @track fields; // array of field names
   @track sortOrder; // integer default 1
  
   @track recordCount = {
@@ -38,10 +38,8 @@ export default class PerfectionList extends LightningElement {
   @track error;
 
   // Private variables
-  version = 'PerfectionList 0.1.4.11 made with <3 by MK Partners, Inc.';
+  version = 'PerfectionList 0.1.4.12 made with <3 by MK Partners, Inc.';
   _filteredRecords; // array of only the records being displayed
-
-
 
   get rowsDivClassName(){
     let name = 'row slds-m-horizontal_small';
@@ -256,7 +254,18 @@ export default class PerfectionList extends LightningElement {
     if ( null === searchString ){
       searchString = column.filterText;
     }
-    if ( column.displayType === 'STRING' || column.displayType === 'EMAIL' || column.displayType === 'PHONE' ){
+    if ( 
+      column.displayType === 'STRING' || 
+      column.displayType === 'TEXTAREA' || 
+      column.displayType === 'EMAIL' || 
+      column.displayType === 'PHONE' || 
+      column.displayType === 'PICKLIST' || 
+      column.displayType === 'MULTIPICKLIST' || 
+      column.displayType === 'ADDRESS' || 
+      column.displayType === 'COMBOBOX' || 
+      column.displayType === 'ID' || 
+      column.displayType === 'URL' 
+    ){
       matchesFilter = this.containsString(searchString, fieldValue);
     } 
     else if ( column.displayType === 'REFERENCE' ){
@@ -267,23 +276,26 @@ export default class PerfectionList extends LightningElement {
           fieldValue = fieldValue[parts[p]];
         }
       }
-      this.log( searchString );
-      this.log( fieldValue );
       if ( typeof fieldValue !== 'object' && typeof fieldValue !== 'undefined' ){
         matchesFilter = this.containsString(searchString, fieldValue);
       }
     }
-    // else if ( column.displayType === 'DATE' ){
-    //   //column.fromDate
-    //   //column.toDate      
-    // }
-    // else if ( column.displayType === 'DATETIME' ){
-    //   //column.fromDate
-    //   //column.toDate      
-    // }
-    // else if ( column.displayType === 'boolean' ){
-    //   //column.fromDate
-    // }
+    else if ( column.displayType === 'DATE' ){
+      matchesFilter = this.containsString(searchString, fieldValue);
+      //column.fromDate
+      //column.toDate      
+    }
+    else if ( column.displayType === 'DATETIME' ){
+      matchesFilter = this.containsString(searchString, fieldValue);
+      //column.fromDate
+      //column.toDate      
+    }
+    else if ( column.displayType === 'DOUBLE' || column.displayType === 'PERCENT' || column.displayType === 'CURRENCY' || column.displayType === 'INTEGER' || column.displayType === 'LONG' ){
+      matchesFilter = this.containsString(searchString, fieldValue);
+    }
+    else if ( column.displayType === 'BOOLEAN' ){
+      matchesFilter = this.containsString(searchString, fieldValue);
+    }
     else {
       matchesFilter = true;
     }
@@ -297,7 +309,7 @@ export default class PerfectionList extends LightningElement {
     if ( null == searchingFor || undefined === searchingFor || searchingFor.trim().length === 0 ){
       doesContainString = true;
     }
-    else if ( null == searchingIn ){
+    else if ( !this.isNotBlank(searchingIn) ){
       doesContainString = false;
     }
     else {
@@ -309,8 +321,8 @@ export default class PerfectionList extends LightningElement {
   }
 
   log(obj) {
-    let string = JSON.stringify(obj);
-    let retObj = (string !== undefined) ? JSON.parse(string) : obj;
+    // let string = JSON.stringify(obj);
+    // let retObj = (string !== undefined) ? JSON.parse(string) : obj;
     // console.log(retObj);
   }
 
