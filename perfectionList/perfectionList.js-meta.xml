@@ -6,5 +6,16 @@
         <target>lightning__AppPage</target>
         <target>lightning__RecordPage</target>
         <target>lightning__HomePage</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
     </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage,lightning__HomePage,lightning__RecordPage">
+            <property name="sObjectName" type="String"/>
+            <property name="fieldsString" type="String"/>
+            <property name="selectedListViewId" type="String"/>
+            <property name="childRelationship" type="String"/>
+            <property name="whereClause" type="String"/>
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>

@@ -7,6 +7,15 @@ a.link {
 a.link:hover {
     color:red;
 }
+.slds-icon-utility-arrowdown {
+    fill: blue;
+}
+.slds-icon-utility-arrowup {
+    fill: blue;
+}
+.lightgray {
+    color: lightgray;
+}
 
 .row {
     border-radius: 0 !important;

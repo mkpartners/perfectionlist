@@ -1,18 +1,24 @@
-import { LightningElement, track } from 'lwc';
+/* eslint-disable no-console */
+import { LightningElement, api, track } from 'lwc';
 import initPFList from '@salesforce/apex/perfectionListController.initPFList';
 
 export default class PerfectionList extends LightningElement {
+  @api sObjectName;
+  @api fieldsString;
+  @api selectedListViewId;
+  @api childRelationship;
+  @api whereClause; // string
 
-  @track columns; // array of columns
+  @track records; // array of original records returned from the DB
+  @track filteredRecords; // array of only the records being displayed
+  @track columns; // array of column objects
+  @track filterText = ''; // global search
+  @track showFilters; // boolean
+
   @track colsAreStringsOrPhones = true;
   @track fields; // array of field names
-  @track filterText = '';
-  @track queriedRecords; // array of queried records
-  @track records; // array of records
-  @track showFilters; // boolean
-  @track sObjectName; // string Default account
   @track sortOrder; // integer default 1
-
+ 
   @track columnFilters = {};
 
   @track recordCount = {
@@ -27,14 +33,12 @@ export default class PerfectionList extends LightningElement {
 
 
   @track error;
-  @track version = '0.1.3.5';
+  @track version = '0.1.4.3';
 
   get cardTitle() {
-
     this.sObjectName = this.sObjectName ? this.sObjectName : 'Account';
     // this.log('SOBJECT');
     // this.log(this.sObjectName);
-
     return this.sObjectName + 's';
   }
 
@@ -60,14 +64,7 @@ export default class PerfectionList extends LightningElement {
   }
 
   connectedCallback() {
-
-    let sobjName = this.sObjectName ? this.sObjectName
-      : 'Account';
-
-    let fieldsString = this.fields ? this.fields.join()
-      : 'Name,Type,Industry,Phone,BillingState,LastModifiedDate';
-
-    initPFList({ sObjectName: sobjName, fieldsString: fieldsString })
+    initPFList({ sObjectName: this.sObjectName, fieldsString: this.fieldsString })
       .then(res => {
 
         // this.log('RES');
@@ -75,9 +72,9 @@ export default class PerfectionList extends LightningElement {
         // data structure attaching a getter for every element in columns
         // this.log('BEFORE');
         let expanded_records = [];
+        let expanded_columns = [];
         let ret_records = res.records;
         let ret_columns = res.columns;
-        let expanded_columns = [];
 
         for(let col = 0; col < ret_columns.length; col++) {
           let keys = Object.keys(ret_columns[col]);
@@ -110,10 +107,9 @@ export default class PerfectionList extends LightningElement {
           expanded_records.push(newRecord);
         }
 
-
         this.records = expanded_records;
         this.columns = expanded_columns;
-        this.queriedRecords = res.records;
+        this.filteredRecords = expanded_records;
         this.recordCount.showing = res.records.length;
         this.recordCount.total = res.records.length;
       })
@@ -136,7 +132,7 @@ export default class PerfectionList extends LightningElement {
     // this.log('the sort state');
     // this.log(this.sortState);
 
-    this.records = this.sort(this.records, columnToSortBy, directionToSortBy);
+    this.filteredRecords = this.sort(this.records, columnToSortBy, directionToSortBy);
     let utilityIcon = directionToSortBy === 'asc' ? 'utility:arrowup' : 'utility:arrowdown';
     
     for(let col = 0; col < this.columns.length; col++) {
@@ -144,21 +140,23 @@ export default class PerfectionList extends LightningElement {
     }
 
     this.columns[colIndex].iconName = utilityIcon;
-    this.log(this.columns[colIndex]);
+    // this.log(this.columns[colIndex]);
+    this.filterRecords();
   }
 
   sort(records, column, direction) {
+    let sortedRecords;
     if (direction === 'asc' || !direction) {
-      return records.sort((a, b) => {
+      sortedRecords = records.sort((a, b) => {
         return a[column] > b[column] || a[column] === null ? 1 : -1;
       });
     }
-
     else if (direction === 'dsc') {
-      return records.sort((b, a) => {
+      sortedRecords = records.sort((b, a) => {
         return a[column] > b[column] ? 1 : -1;
       });
     }
+    return sortedRecords;
   }
 
   handleSObjectName(event) {
@@ -166,19 +164,115 @@ export default class PerfectionList extends LightningElement {
     this.sObjectName = event.detail.value.trim();
   }
 
+  searchRecords(event){
+    this.filterText = event.target.value;
+    this.filterRecords();
+  }
+
+  handleColumnFilterUpdate(event){
+    let columnId = event.target.id;
+    columnId = columnId.substring(0,columnId.indexOf('-'));
+    // this.log( columnId );
+    let columnList = this.columns;
+    for ( let c=0; c<columnList.length; c++ ){
+      columnList[c].class = '';
+      // this.log(columnList[c].name);
+      if ( columnList[c].name === columnId ){
+        columnList[c].filterText = event.detail.value;
+        columnList[c].class = 'blue';
+      }
+    }
+    this.columns = columnList;
+    this.filterRecords();
+  }
+
+  filterRecords(){
+    let recordsList = this.records;
+    let columnList = this.columns;
+    let globalSearchString = this.filterText;
+    let filteredList = [];
+    for ( let r=0; r<recordsList.length; r++ ){
+      let record = recordsList[r];
+      let recordMatchesSearch = false;
+      let recordMatchesColumnFilter= true;
+      for ( let c=0; c<columnList.length; c++ ){
+        let column = columnList[c];
+        // this.log( column );
+        let fieldValue = record[column.name];
+        let matchesSearch = this.passesSearch(fieldValue, globalSearchString);
+        if ( matchesSearch ){
+          recordMatchesSearch = true;
+        }
+        let matchesColumnFilter = this.passesColumnFilter( fieldValue, column);
+        if ( matchesColumnFilter === false ){
+          recordMatchesColumnFilter = false;
+        }
+        // this.log( recordMatchesColumnFilter );
+      }
+      // this.log( {"recordMatchesSearch": recordMatchesSearch, "recordMatchesColumnFilter": recordMatchesColumnFilter} );
+      if ( recordMatchesSearch && recordMatchesColumnFilter ){
+        filteredList.push(record);
+      }
+    }
+    this.filteredRecords = filteredList;
+  }
+
+  passesSearch(fieldValue, globalSearchString){
+    let matchesGlobalSearchString = false;
+    if ( null === globalSearchString || globalSearchString.length === 0 ){
+      matchesGlobalSearchString = true;
+    } else {
+      matchesGlobalSearchString = this.containsString(globalSearchString, fieldValue);
+    }
+    return matchesGlobalSearchString;
+  }
+
+  passesColumnFilter(fieldValue, column){
+    let matchesColumnFilter = false;
+    if ( null != column.filterText && (column.displayType === 'STRING' || column.displayType === 'PHONE') ){
+      matchesColumnFilter = this.containsString(column.filterText, fieldValue);
+      // this.log( {'matchesColumnFilter': matchesColumnFilter} );
+    } 
+    else if ( column.displayType === 'DATE' ){
+      //column.fromDate
+      //column.toDate      
+    }
+    else if ( column.displayType === 'DATETIME' ){
+      //column.fromDate
+      //column.toDate      
+    }
+    else if ( column.displayType === 'boolean' ){
+      //column.fromDate
+    }
+    else {
+      matchesColumnFilter = true;
+    }
+    return matchesColumnFilter;
+  }
+
+  containsString(searchingFor, searchingIn){
+    // this.log( {"searchingFor": searchingFor, "searchingIn": searchingIn} );
+    let doesContainString;
+    if ( null == searchingFor || searchingFor.trim().length === 0 ){
+      doesContainString = true;
+    }
+    else if ( null == searchingIn ){
+      doesContainString = false;
+    }
+    else {
+      searchingFor = searchingFor.trim().toLowerCase();
+      searchingIn = searchingIn.trim().toLowerCase();
+      doesContainString = searchingIn.includes( searchingFor );
+    }
+    return doesContainString;
+  }
+
+  // global search
   searchColumns(event) {
 
     this.filterText = event.target.value;
     let records = this.records;
-
-    if (this.filterText === '') {
-
-      this.connectedCallback();
-    }
-
-    this.log(this.filterText);
-
-    let filteredRecords = [];
+    let recordsToKeep = [];
 
     for (let r = 0; r < records.length; r++) {
 
@@ -189,66 +283,54 @@ export default class PerfectionList extends LightningElement {
 
         let col = this.columns[i];
         let val = record[col.name] ? record[col.name].toString() : '';
-        this.log('val');
-        this.log(val);
-        let colName = col.label
 
-        this.log('FILTER TEXT');
-        this.log(this.filterText);
-        this.log('col');
-        this.log(col);
-
-        if (col.type === 'STRING' && val.toLowerCase().startsWith(this.filterText.toLowerCase())) {
-          this.log('I AM A STRRING');
-          this.log(val.toLowerCase());
+        if (
+            col.type === 'STRING' 
+            && val.toLowerCase().startsWith(this.filterText.toLowerCase())
+        ) {
           keep = true;
         }
-        else if (col.type === 'PHONE' && val.includes(this.filterText)) {
-
+        else if (
+          col.type === 'PHONE' 
+          && val.includes(this.filterText)
+        ) {
           keep = true;
         }
         // else if (col.type === 'PICKLIST' && helper.findInArray(this.columnFilters, colName, val)) {
 
         //     keep = false;
         // }
-        else if ((col.type === 'DATE' || col.type === 'DATETIME') && null !== col.filterFromDate && '' !== col.filterFromDate && col.filterFromDate > val) {
+        else if (
+          (col.type === 'DATE' || col.type === 'DATETIME') 
+                && null !== col.filterFromDate 
+                && '' !== col.filterFromDate 
+                && col.filterFromDate > val
+        ) {
 
           keep = true;
         }
-        else if ((col.type === 'DATE' || col.type === 'DATETIME') && null !== col.filterToDate && '' !== col.filterToDate && col.filterToDate < val) {
-
+        else if (
+          (col.type === 'DATE' || col.type === 'DATETIME') 
+                && null !== col.filterToDate 
+                && '' !== col.filterToDate 
+                && col.filterToDate < val
+        ) {
           keep = true;
         }
       }
 
-      this.log('keep');
-      this.log(keep);
-
       if (keep) {
-        this.log('HEEEEELLLLO');
-        filteredRecords.push(this.records[r]);
-        this.queriedRecords = filteredRecords;
+        recordsToKeep.push(this.records[r]);
+        this.filteredRecords = recordsToKeep;
       }
     }
 
-    this.log('filteredRecords');
-    this.log(filteredRecords);
-    this.records = filteredRecords;
-    this.log('records');
-    this.log(this.records);
-    this.recordCount.showing = filteredRecords.length;
-  }
-
-  checkIfMatches(filterText, val, type) {
-
-
+    this.recordCount.showing = recordsToKeep.length;
   }
 
   log(obj) {
-
     let string = JSON.stringify(obj);
     let retObj = (string !== undefined) ? JSON.parse(string) : obj;
-
     console.log(retObj);
   }
 
