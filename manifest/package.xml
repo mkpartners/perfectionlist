@@ -6,10 +6,6 @@
     </types>
     <types>
         <members>*</members>
-        <name>ApexTestSuite</name>
-    </types>
-    <types>
-        <members>*</members>
         <name>LightningComponentBundle</name>
     </types>
     <version>45.0</version>

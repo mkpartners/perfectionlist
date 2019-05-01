@@ -41,7 +41,7 @@
     </div>
 
     <!-- DataRows -->
-    <div id="rows" style={rowsDivStyle} >
+    <div class="row slds-m-horizontal_small" id="rows" style={rowsDivStyle} >
       <template for:each={displayedRecords} for:item="record">
         <lightning-record-view-form record-id={record.Id} 
                                     object-api-name={sObjectName}

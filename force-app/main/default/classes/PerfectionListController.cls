@@ -9,18 +9,18 @@ public class PerfectionListController {
     String childRelationship,
     String whereClause
   ){
-    Map<Id,ListView> listViewsOptions = queryListViewsOptions(sObjectName);
-
     Map<String,Object> res = new Map<String,Object>();
+    if ( String.isNotBlank(sObjectName) && String.isNotBlank(fieldsString) ){
+      res = getColumns(sObjectName, fieldsString);
+      fieldsString = (String)res.get('fieldsString');
+    }
+
+    Map<Id,ListView> listViewsOptions = queryListViewsOptions(sObjectName);
     res.put( 'listViewsOptions', listViewsOptions );
 
     List<sObject> records = queryRecords(sObjectName, fieldsString, selectedListViewId, parentId, childRelationship, whereClause);
     res.put('records',records);
 
-    if ( String.isNotBlank(sObjectName) && String.isNotBlank(fieldsString) ){
-      List<Map<String,Object>> columns = getColumns(sObjectName, fieldsString);
-      res.put( 'columns', columns );
-    }
     return res;
   }
 
@@ -108,10 +108,13 @@ public class PerfectionListController {
     }
     return res;
   }
-
-  public static List<Map<String,Object>> getColumns(String sObjectName, String fieldsString){
+  
+  //List<Map<String,Object>>
+  public static Map<String,Object> getColumns(String sObjectName, String fieldsString){
+    Map<String,Object> res = new Map<String,Object>();
     List<Map<String,Object>> columns = new List<Map<String,Object>>();
     Map<String, Schema.SObjectField> fieldMap = Schema.getGlobalDescribe().get(sObjectName).getDescribe().fields.getMap();
+    List<String> fieldList = new List<String>();
     for ( String f : fieldsString.split(',') ){
       if ( fieldMap.containsKey(f) ){
         Schema.DescribeFieldResult dfr = fieldMap.get(f).getDescribe();
@@ -119,6 +122,8 @@ public class PerfectionListController {
 
         Map<String,Object> fieldDef = new Map<String,Object>();
         fieldDef.put('name', dfr.getName() );
+        fieldList.add( dfr.getName() );
+
         fieldDef.put('label', dfr.getLabel() );
         fieldDef.put('filterText', '');
         fieldDef.put('filterFromDate', '');
@@ -131,6 +136,22 @@ public class PerfectionListController {
           fieldDef.put('picklistValues',picklistValues);
         }
         else if ( dfrType == 'REFERENCE' ){
+          //If not a Task, Case, or Event
+          String relatedRecordFieldName = dfr.getName();
+          if ( relatedRecordFieldName.endsWith('__c') ){
+            relatedRecordFieldName.replace('__c','__r');
+          } 
+          else if( relatedRecordFieldName.endsWith('Id') ){
+            relatedRecordFieldName = relatedRecordFieldName.subStringBeforeLast('Id');
+          }
+          if ( dfr.getReferenceTo()[0] == Schema.Case.sObjectType || dfr.getReferenceTo()[0] == Schema.Event.sObjectType || dfr.getReferenceTo()[0] == Schema.Task.sObjectType ){
+            relatedRecordFieldName += '.Subject';
+          } else {
+            relatedRecordFieldName += '.Name';
+          }
+          fieldDef.put('relatedRecordFieldName',relatedRecordFieldName);
+          fieldList.add( relatedRecordFieldName );
+
           List<String> picklistValues = new List<String>();
           if ( dfr.getLabel().endsWith(' Id') ){
             fieldDef.put('label', dfr.getLabel().subStringBeforeLast(' Id') );
@@ -152,7 +173,9 @@ public class PerfectionListController {
     system.debug( columns );
     // columns[0].put('isFirst', true);
     // columns[columns.size()-1].put('isLast', true);
-    return columns;
+    res.put( 'fieldsString', String.join(fieldList,',') );
+    res.put( 'columns', columns );
+    return res;
   }
 
     // @AuraEnabled

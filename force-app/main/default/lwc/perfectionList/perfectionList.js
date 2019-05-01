@@ -36,7 +36,7 @@ export default class PerfectionList extends LightningElement {
   };
 
   @track error;
-  version = 'PerfectionList 0.1.4.8 made with <3 by MK Partners, Inc.';
+  version = 'PerfectionList 0.1.4.10 made with <3 by MK Partners, Inc.';
 
   get rowsDivClassName(){
     let name = 'row slds-m-horizontal_small';
@@ -49,11 +49,6 @@ export default class PerfectionList extends LightningElement {
   get displayedRecords(){
     return this._filteredRecords;
 
-    // let filteredRecords = [];
-    // if ( this.records != null ){
-    //   filteredRecords = this.filterRecords();
-    // }
-    // return filteredRecords;
   }
 
   get cardTitleLabel() {
@@ -160,7 +155,7 @@ export default class PerfectionList extends LightningElement {
     }
     this.columns[colIndex].iconName = utilityIcon;
     // this.log(this.columns[colIndex]);
-    // this.filterRecords();
+    this.filterRecords();
   }
 
   sort(records, column, direction) {
@@ -220,11 +215,17 @@ export default class PerfectionList extends LightningElement {
         let column = columnList[c];
         // this.log( column );
         let fieldValue = record[column.name];
-        let matchesSearch = this.passesSearch(fieldValue, globalSearchString);
+        let matchesSearch = true;
+        if ( undefined !== globalSearchString && null != globalSearchString && globalSearchString.length > 0 ){
+          matchesSearch = this.passesSearch(fieldValue, globalSearchString);
+        }
         if ( matchesSearch ){
           recordMatchesSearch = true;
         }
-        let matchesColumnFilter = this.passesColumnFilter( fieldValue, column);
+        let matchesColumnFilter = true;
+        if ( undefined !== column.filterText && null != column.filterText && column.filterText.length > 0 ){
+          matchesColumnFilter = this.passesColumnFilter( record, column);
+        }
         if ( matchesColumnFilter === false ){
           recordMatchesColumnFilter = false;
         }
@@ -249,23 +250,40 @@ export default class PerfectionList extends LightningElement {
     return matchesGlobalSearchString;
   }
 
-  passesColumnFilter(fieldValue, column){
+  passesColumnFilter(record, column){
+    let fieldValue = record[column.name];
     let matchesColumnFilter = false;
     if ( null != column.filterText && (column.displayType === 'STRING' || column.displayType === 'PHONE') ){
       matchesColumnFilter = this.containsString(column.filterText, fieldValue);
       // this.log( {'matchesColumnFilter': matchesColumnFilter} );
     } 
-    else if ( column.displayType === 'DATE' ){
-      //column.fromDate
-      //column.toDate      
+    else if ( column.displayType === 'REFERENCE' ){
+      fieldValue = record;
+      let parts = column.relatedRecordFieldName.split('.');
+      for ( let p=0; p<parts.length; p++ ){
+        this.log(fieldValue);
+        this.log(parts[p]);
+        if ( fieldValue.hasOwnProperty(parts[p]) ){
+          fieldValue = fieldValue[parts[p]];
+        }
+      }
+      this.log( column.filterText );
+      this.log( fieldValue );
+      if ( typeof fieldValue !== 'object' && typeof fieldValue !== 'undefined' ){
+        matchesColumnFilter = this.containsString(column.filterText, fieldValue);
+      }
     }
-    else if ( column.displayType === 'DATETIME' ){
-      //column.fromDate
-      //column.toDate      
-    }
-    else if ( column.displayType === 'boolean' ){
-      //column.fromDate
-    }
+    // else if ( column.displayType === 'DATE' ){
+    //   //column.fromDate
+    //   //column.toDate      
+    // }
+    // else if ( column.displayType === 'DATETIME' ){
+    //   //column.fromDate
+    //   //column.toDate      
+    // }
+    // else if ( column.displayType === 'boolean' ){
+    //   //column.fromDate
+    // }
     else {
       matchesColumnFilter = true;
     }

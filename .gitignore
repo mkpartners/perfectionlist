@@ -3,6 +3,5 @@
 /deploy
 .sfdx/
 .vscode/
-
-README.md
+git 
 sfdx-project.json
