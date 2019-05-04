@@ -1,7 +1,10 @@
 .overflow {
     overflow: scroll;
 }
-
+.slds-card__header {
+    padding: 0px !important;
+    margin-bottom: 0px !important;
+}
 a.link {
     color: rgb(0, 109, 204) !important;
     text-decoration: underline !important;
@@ -32,5 +35,5 @@ a.link:hover {
 }
 
 :host .max_width {
-  max-width: 170px;
+  max-width: 130px;
 }

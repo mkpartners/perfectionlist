@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 import { LightningElement, api, track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import initPFList from '@salesforce/apex/PerfectionListController.initPFList';
 
-export default class PerfectionList extends LightningElement {
+export default class PerfectionList extends NavigationMixin(LightningElement) {
 
   // Attributes passed in to the Component by the Page
   @api recordId;  //RecordId if renderd on a Record's Page
@@ -18,6 +19,7 @@ export default class PerfectionList extends LightningElement {
   @track columns; // array of column objects
   @track filterText = ''; // global search
   @track records; // array of original records returned from the DB
+  @track selectedListView;
 
   @track showFilters; // boolean
 
@@ -35,11 +37,18 @@ export default class PerfectionList extends LightningElement {
     direction: ''
   };
 
+  @track _iconName;
   @track error;
 
   // Private variables
-  version = 'PerfectionList 0.1.4.12 made with <3 by MK Partners, Inc.';
+  version = 'PerfectionList 0.1.5.1 made with <3 by MK Partners, Inc.'; // --> © ® ™ work
   _filteredRecords; // array of only the records being displayed
+  _listViewsOptions;
+  _queryDateTime;
+
+  get queryDateTime(){
+    return this._queryDateTime;
+  }
 
   get rowsDivClassName(){
     let name = 'row slds-m-horizontal_small';
@@ -49,9 +58,12 @@ export default class PerfectionList extends LightningElement {
     return name;
   }
 
+  get lvOptions() {
+    return this._listViewsOptions;
+  }
+  
   get displayedRecords(){
     return this._filteredRecords;
-
   }
 
   get cardTitleLabel() {
@@ -63,15 +75,11 @@ export default class PerfectionList extends LightningElement {
   }
 
   get searchPlaceHolder() {
-    return 'Search';
+    return 'Search this list...';
   }
 
   get iconName() {
-    let iconName = '';
-    if ( null != this.sObjectName && undefined !== this.sObjectName ){
-      iconName = 'standard:' + this.sObjectName.includes('__') ? 'lightning_component' : this.sObjectName.toLowerCase();
-    }
-    return iconName;
+    return this._iconName;
   }
 
   get searchBoxWidth() {
@@ -82,59 +90,75 @@ export default class PerfectionList extends LightningElement {
     return 'slds-m-right_xx-small slds-truncate slds-col cell slds-size_1-of-' + this.columns.length;
   }
 
+  get showListViewOptions(){
+    let predefined = this.isNotBlank(this.whereClause) || this.isNotBlank(this.childRelationship) || this.isNotBlank(this.selectedListViewId);
+    return predefined === false;
+  }
+
   connectedCallback() {
+    this.showFilters = false;
+    if ( this.isNotBlank(this.selectedListViewId) ){
+      this.selectedListView = this.selectedListViewId;
+    }
+    this.populateTable();
+  }
+
+  populateTable(){
     initPFList({ 
       sObjectName: this.sObjectName, 
       fieldsString: this.fieldsString, 
-      selectedListViewId: this.selectedListViewId,
+      selectedListViewId: this.selectedListView,
       parentId: this.recordId,
       childRelationship: this.childRelationship,  
       whereClause: this.whereClause
     })
       .then(res => {
-        // this.log( this.recordId );
         this.log('RES');
         this.log(res);
-        // data structure attaching a getter for every element in columns
-        // this.log('BEFORE');
-        let expanded_records = [];
-        let expanded_columns = [];
-        let ret_records = res.records;
-        let ret_columns = res.columns;
+        this._queryDateTime = new Date();
+        if ( null != this.sObjectName && undefined !== this.sObjectName ){
+          this._iconName = this.sObjectName.includes('__') ? 'standard:lightning_component' : 'standard:' + this.sObjectName.toLowerCase();
+        }
+        let ret_listViewsOptions = res.listViewsOptions;
 
-        for(let col = 0; col < ret_columns.length; col++) {
-          let keys = Object.keys(ret_columns[col]);
-          let vals = Object.values(ret_columns[col]);
-          let newCol = {};
-          for(let key = 0; key < keys.length; key++) {
-            newCol[keys[key]] = vals[key];
-          }          
+        let expanded_columns = [];
+        for(let col = 0; col < res.columns.length; col++) {
+          let newCol = res.columns[col];
           newCol.iconName = 'utility:sort';
+          newCol.iconState = false;
           expanded_columns.push(newCol);
         }
 
-        for (let rec = 0; rec < ret_records.length; rec++) {
-          let keys = Object.keys(ret_records[rec]);
-          let vals = Object.values(ret_records[rec]);
-          let newRecord = {};
-          for (let key = 0; key < keys.length; key++) {
-            newRecord[keys[key]] = vals[key];
-          }
-          newRecord.link = `/lightning/r/${this.sObjectName}/${ret_records[rec].Id}/view`;
+        let expanded_records = [];
+        for (let rec = 0; rec < res.records.length; rec++) {
+          let newRecord = res.records[rec];
+          newRecord.link = `/lightning/r/${this.sObjectName}/${res.records[rec].Id}/view`;
           expanded_records.push(newRecord);
         }
+
+        let tempListViewsOptions = [];
+        for(let lvo in ret_listViewsOptions ) {
+          if ( ret_listViewsOptions.hasOwnProperty(lvo) ){
+            let opt = { label: ret_listViewsOptions[lvo].Name, value: ret_listViewsOptions[lvo].Id };
+            tempListViewsOptions.push( opt );
+          }
+        }
+        this._listViewsOptions = tempListViewsOptions;
 
         this.records = expanded_records;
         this._filteredRecords = expanded_records;
         this.columns = expanded_columns;
-        // this.filteredRecords = expanded_records;
         this.recordCount.showing = res.records.length;
-        this.recordCount.total = res.records.length;
+        this.recordCount.total = res.records.length;        
       })
       .catch(err => {
+        this.log( err );
         this.error = err;
       });
+  }
 
+  toggleFilterList(){
+    this.showFilters = !this.showFilters;
   }
 
   alphabetize(event) {
@@ -147,17 +171,15 @@ export default class PerfectionList extends LightningElement {
     this.sortState.direction = directionToSortBy;
     this.sortState.column = columnToSortBy;
 
-    // this.log('the sort state');
-    // this.log(this.sortState);
-
     this.filteredRecords = this.sort(this.records, columnToSortBy, directionToSortBy);
     let utilityIcon = directionToSortBy === 'asc' ? 'utility:arrowup' : 'utility:arrowdown';
     
     for(let col = 0; col < this.columns.length; col++) {
       this.columns[col].iconName = 'utility:sort';
+      this.columns[col].iconState = false;
     }
     this.columns[colIndex].iconName = utilityIcon;
-    // this.log(this.columns[colIndex]);
+    this.columns[colIndex].iconState = true;
     this.filterRecords();
   }
 
@@ -177,8 +199,22 @@ export default class PerfectionList extends LightningElement {
   }
 
   handleSObjectName(event) {
-
     this.sObjectName = event.detail.value.trim();
+  }
+
+  handleListView(event) {
+    this.selectedListView = event.detail.value;
+    this.populateTable();
+  }
+
+  navigateToNewRecordPage() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: {
+        objectApiName: this.sObjectName,
+        actionName: 'new'
+      }
+    });
   }
 
   searchRecords(event){
@@ -236,7 +272,7 @@ export default class PerfectionList extends LightningElement {
         }
       }
       if ( recordMatchesSearch && recordMatchesColumnFilter ){
-        this.log( {"recordMatchesSearch": recordMatchesSearch, "recordMatchesColumnFilter": recordMatchesColumnFilter} );
+        // this.log( {"recordMatchesSearch": recordMatchesSearch, "recordMatchesColumnFilter": recordMatchesColumnFilter} );
         filteredList.push(record);
       }
     }
@@ -299,7 +335,7 @@ export default class PerfectionList extends LightningElement {
     else {
       matchesFilter = true;
     }
-    this.log( column.displayType+' '+column.name+' '+matchesFilter );
+    // this.log( column.displayType+' '+column.name+' '+matchesFilter );
     return matchesFilter;
   }
 
@@ -320,10 +356,15 @@ export default class PerfectionList extends LightningElement {
     return doesContainString;
   }
 
+  refresh(event) {
+    this.populateTable();
+    // Retain filter state
+  }
+
   log(obj) {
-    // let string = JSON.stringify(obj);
-    // let retObj = (string !== undefined) ? JSON.parse(string) : obj;
-    // console.log(retObj);
+    let string = JSON.stringify(obj);
+    let retObj = (string !== undefined) ? JSON.parse(string) : obj;
+    console.log(retObj);
   }
 
 }

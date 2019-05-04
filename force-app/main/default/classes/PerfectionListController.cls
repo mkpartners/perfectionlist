@@ -1,4 +1,4 @@
-public class PerfectionListController {
+public with sharing class PerfectionListController {
 
   @AuraEnabled
   public static Map<String,Object> initPFList(
@@ -10,18 +10,43 @@ public class PerfectionListController {
     String whereClause
   ){
     Map<String,Object> res = new Map<String,Object>();
-    if ( String.isNotBlank(sObjectName) && String.isNotBlank(fieldsString) ){
-      res = getColumns(sObjectName, fieldsString);
-      fieldsString = (String)res.get('fieldsString');
+    try {
+      if ( String.isNotBlank(sObjectName) && String.isNotBlank(fieldsString) ){
+        res.putAll( getColumns(sObjectName, fieldsString) );
+        fieldsString = (String)res.get('fieldsString');
+      }
+    } catch ( Exception e ){
+      res.put( 'errors', e.getMessage() );
     }
 
-    Map<Id,ListView> listViewsOptions = queryListViewsOptions(sObjectName);
-    res.put( 'listViewsOptions', listViewsOptions );
+    // try {
+    //   if ( String.isNotBlank(sObjectName) ){
+    //     res.put( 'thisObject', getThisObject(sObjectName);
+    //   }
+    // } catch ( Exception e ){
+    //   res.put( 'errors', e.getMessage() );
+    // }
+
+    try {
+      Map<Id,ListView> listViewsOptions = queryListViewsOptions(sObjectName);
+      res.put( 'listViewsOptions', listViewsOptions );
+    } catch ( Exception e ){
+
+    }
 
     List<sObject> records = queryRecords(sObjectName, fieldsString, selectedListViewId, parentId, childRelationship, whereClause);
+    system.debug( records.size() );
     res.put('records',records);
 
     return res;
+  }
+
+  public static Map<String,String> getThisObject(String sObjectName){
+    Map<String,String> objDescribe = new Map<String,String>();
+    DescribeSObjectResult r = Schema.getGlobalDescribe().get(sObjectName).getDescribe();
+    objDescribe.put('labelPlural', r.getLabelPlural() );
+    objDescribe.put('label', r.getLabel() );
+    return objDescribe;
   }
 
   public static Map<Id,ListView> queryListViewsOptions(String sObjectName){

@@ -1,67 +1,211 @@
 <template>
-  <lightning-card title={cardTitleLabel} icon-name={iconName}>
-       
-    <!-- version -->
-    <strong class="slds-m-horizontal_medium">Displaying: {recordCount.showing} out of {recordCount.total}</strong>
+  <lightning-card>
+    <!-- title -->
+    <div slot="title" >
+    </div>
+    <div style="margin-top: -25px;" class="slds-page-header--object-home slds-page-header_joined slds-page-header_bleed slds-page-header slds-shrink-none test-headerRegion forceListViewManagerHeader" role="banner" >
+      <div class="slds-grid" >
+        <div class="slds-col slds-has-flexi-truncate" >
+          <div class="slds-media slds-no-space slds-grow" >
+            <lightning-icon icon-name={iconName} alternative-text="Icon" size="small"></lightning-icon>
+            <div class="slds-media__body slds-align-middle" >
+              <nav role="navigation" aria-label="Breadcrumbs" >
+                <ol class="slds-breadcrumb slds-list--horizontal" >
+                  <li class="slds-breadcrumb__item slds-line-height--reset" >
+                    <span class="uiOutputText forceBreadCrumbItem" >{cardTitle}</span>
+                  </li>
+                </ol>
+              </nav>
+              <div class="slds-grid" >
+                <template if:true={showListViewOptions} >
+                  <lightning-combobox class="slds-m-horizontal_xx-small"
+                                      name="list views"
+                                      options={lvOptions}
+                                      onchange={handleListView}
+                                      placeholder="List Views"
+                                      style="max-width: 185px;"
+                                      value={selectedListView}
+                                      variant="label-hidden"
+                  ></lightning-combobox> 
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slds-col slds-no-flex slds-grid slds-align-top slds-p-bottom--xx-small test-lvmForceActionsContainer" >
+          <lightning-button-group>
+            <lightning-button label="New" title="New" onclick={navigateToNewRecordPage} class="slds-m-left_x-small"></lightning-button>
+          </lightning-button-group>
+        </div>
+      </div>
+      <div class="slds-grid " >
+        <div class="slds-col slds-align-bottom" >
+          <div class="slds-text-body--small">
+            <span class="countSortedByFilteredBy">{recordCount.showing} items<!-- • Sorted by Created Date • Filtered by all transactions • --></span><br/>
+            <span>
+              Updated <lightning-relative-date-time value={queryDateTime}></lightning-relative-date-time>
+            </span>
+          </div>
+        </div>
+        <div class="slds-col slds-no-flex slds-grid slds-align-bottom slds-shrink" >
+          <div class="search-in-list slds-m-left_large slds-is-relative">
+            <lightning-input if:true={columns}
+                            onchange={searchRecords}
+                            type="search"
+                            variant="label-hidden"
+                            placeholder={searchPlaceHolder}
+                            value={filterText}>
+            </lightning-input>
+          </div>
+        </div>
+        <div class="slds-col slds-no-flex slds-grid slds-align-bottom" >
+          <div class="test-listViewSettingsMenu slds-m-left_xx-small forceListViewSettingsMenu"  data-aura-class="forceListViewSettingsMenu">
+            <div class="slds-dropdown-trigger slds-dropdown-trigger_click" title="List View Controls" >
+<!-- 
+              <button class="slds-button slds-button_icon slds-button_icon-more" aria-expanded="false" aria-haspopup="true" title="List View Controls" >        
+                <lightning-primitive-icon  lightning-primitiveicon_primitiveicon-host="">
+                  <svg lightning-primitiveIcon_primitiveIcon="" focusable="false" data-key="settings" aria-hidden="true" class="slds-button__icon">
+                    <use lightning-primitiveIcon_primitiveIcon="" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.24.0#settings">
+                    </use>
+                  </svg>
+                </lightning-primitive-icon>
+                <lightning-primitive-icon data-data-rendering-service-uid="426"  lightning-primitiveicon_primitiveicon-host="">
+                  <svg lightning-primitiveIcon_primitiveIcon="" focusable="false" data-key="down" aria-hidden="true" class="slds-button_icon slds-button__icon_x-small slds-m-left_xx-small">
+                    <use lightning-primitiveIcon_primitiveIcon="" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.24.0#down">
+                    </use>
+                  </svg>
+                </lightning-primitive-icon>
+                <span class="slds-assistive-text" >List View Controls</span>
+              </button>
+ -->
+              <div class="slds-dropdown slds-dropdown_right" >
+                <!-- <ul class="dropdown__list" role="menu" >
+                </ul> -->
+              </div>
+            </div>
+          </div>
+          <div class="test-listviewdisplayswitcher forceListViewManagerDisplaySwitcher" >
+            <div class="slds-dropdown-trigger slds-dropdown-trigger_click" title="Display as Table" >
 
-    <!-- Searchbox -->
-    <lightning-input if:true={columns}
-                    onchange={searchRecords}
-                    type="search"
-                    class={searchBoxWidth}
-                    variant="label-hidden"
-                    placeholder={searchPlaceHolder}
-                    value={filterText}>
-    </lightning-input>
-
+              <!-- 
+              <button class="slds-button slds-button_icon slds-button_icon-more" aria-expanded="false" aria-haspopup="true" title="Display as Table" >
+                <lightning-primitive-icon  lightning-primitiveicon_primitiveicon-host="">
+                  <svg lightning-primitiveIcon_primitiveIcon="" focusable="false" data-key="table" aria-hidden="true" class="slds-button__icon">
+                    <use lightning-primitiveIcon_primitiveIcon="" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.24.0#table"></use>
+                  </svg>
+                </lightning-primitive-icon>
+                <lightning-primitive-icon data-data-rendering-service-uid="427"  lightning-primitiveicon_primitiveicon-host="">
+                  <svg lightning-primitiveIcon_primitiveIcon="" focusable="false" data-key="down" aria-hidden="true" class="slds-button_icon slds-button__icon_x-small slds-m-left_xx-small">
+                    <use lightning-primitiveIcon_primitiveIcon="" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.24.0#down"></use>
+                  </svg>
+                </lightning-primitive-icon>
+                <span class="slds-assistive-text" >Display as Table</span>
+              </button> -->
+              <div class="slds-dropdown slds-dropdown_right" >
+                <!-- <ul class="dropdown__list" role="menu" >                    
+                </ul> -->
+              </div>
+            </div>
+          </div>
+        <div class="slds-m-left_xx-small">
+          <div class="slds-button-group" style="background-color: white;" >
+            <lightning-button-icon alternative-text="Refresh"
+              class="forceRefreshButton"
+              icon-name="utility:refresh"
+              onclick={refresh}>
+            </lightning-button-icon>
+            <lightning-button-icon alternative-text="Filter"
+              class="listViewManagerHeaderButton"
+              icon-name="utility:filterList"
+              onclick={toggleFilterList}>
+            </lightning-button-icon>
+          </div>
+          <!-- <div class="slds-button-group">
+            <lightning-button-icon class="forceInlineEditButton">
+              <button name="inlineEditButton" title="Edit List" type="button" class="slds-button slds-button_icon-border-filled">
+                <lightning-primitive-icon lightning-primitiveicon_primitiveicon-host=""><svg lightning-primitiveIcon_primitiveIcon="" focusable="false" data-key="edit" aria-hidden="true" class="slds-button__icon"><use lightning-primitiveIcon_primitiveIcon="" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.24.0#edit"></use></svg>
+                </lightning-primitive-icon><span class="slds-assistive-text">Edit List</span></button></lightning-button-icon></div>
+                <div class="slds-button-group">
+                <lightning-button-icon-stateful class="listViewManagerHeaderButton chartButton">
+                  <button type="button" role="button" title="Show charts" aria-pressed="false" class="slds-button slds-button_icon slds-button_icon-border-filled"><lightning-primitive-icon lightning-primitiveicon_primitiveicon-host=""><svg lightning-primitiveIcon_primitiveIcon="" focusable="false" data-key="chart" aria-hidden="true" class="slds-button__icon">
+                <use lightning-primitiveIcon_primitiveIcon="" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.24.0#chart">
+              </use></svg></lightning-primitive-icon><span class="slds-assistive-text">Show charts</span>
+              </button>
+            </lightning-button-icon-stateful>
+            <lightning-button-icon-stateful class="listViewManagerHeaderButton filterButton">
+              <button type="button" role="button" title="Show filters" aria-pressed="false" class="slds-button slds-button_icon slds-button_icon-border-filled">
+                <lightning-primitive-icon lightning-primitiveicon_primitiveicon-host="">
+                  <svg lightning-primitiveIcon_primitiveIcon="" focusable="false" data-key="filterList" aria-hidden="true" class="slds-button__icon">
+                    <use lightning-primitiveIcon_primitiveIcon="" xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg?cache=9.24.0#filterList">
+                    </use>
+                  </svg>
+                </lightning-primitive-icon>
+                <span class="slds-assistive-text">Show filters</span>
+              </button>
+            </lightning-button-icon-stateful>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
     <!-- ColumnHeaders -->
     <div class="slds-grid slds-box 
                 slds-box_xx-small 
-                slds-m-horizontal_small
                 slds-table_col-bordered 
                 row-header">
       <template if:true={columns} for:each={columns} for:item='column' for:index='index'>
-        <div key={column} class={columnGridLength} >
-          <strong class="slds-text-title_caps">
-            {column.label}
-            <lightning-icon icon-name={column.iconName}
-                            data-value={column.name}
-                            data-index={index}
-                            onclick={alphabetize}
-                            size="xx-small"
-                            class={column.class} ></lightning-icon>
-          </strong>
+        <div key={column} class={columnGridLength} style="margin-right:0px;">
+          <strong class="slds-text-title_caps" style="max-width: 95%; overflow: hidden; text-overflow: ellipsis;white-space: nowrap;" >{column.label}</strong>
+          <!-- <a class="toggle slds-th__action slds-text-link--reset " href="javascript:void(0);">
+            <span class="slds-assistive-text" data-aura-rendered-by="44:382;a">Sort</span>
+            <span class="slds-truncate" title={column.label} >{column.label}</span>
+          </a> -->
+          <div class="slds-dropdown-trigger slds-dropdown-trigger_click keyboardMode--trigger keyboard--default-focus forceListViewManagerGridColumnHeaderMenu" >
+            <lightning-button-icon-stateful icon-name={column.iconName}
+              selected={column.iconState}
+              data-value={column.name}
+              data-index={index}
+              onclick={alphabetize}
+              size="xx-small"
+              class={column.class} 
+            ></lightning-button-icon-stateful>
+          </div>
 
           <!-- col filters -->
-          <template if:true={colsAreStringsOrPhones}>
-            <lightning-input value={column.filterText} id={column.name} key={column} class="max_width" onchange={handleColumnFilterUpdate} ></lightning-input>          
+          <template if:true={showFilters}>
+            <lightning-input value={column.filterText} 
+                            id={column.name} 
+                            key={column} 
+                            class="max_width" 
+                            onchange={handleColumnFilterUpdate} ></lightning-input>          
           </template>
         </div>
       </template>
     </div>
 
     <!-- DataRows -->
-    <div class="row slds-m-horizontal_small" id="rows" style={rowsDivStyle} >
+    <div id="rows" style={rowsDivStyle} >
       <template for:each={displayedRecords} for:item="record">
         <lightning-record-view-form record-id={record.Id} 
                                     object-api-name={sObjectName}
                                     key={record}>
           <div class="slds-grid slds-box slds-box_xx-small row striped-row" >
             <template iterator:it={columns}>
-              <div key={it.value.Id} class={columnGridLength}/>
+              <div key={it.value.Id} class={columnGridLength} style="margin-right:0px;" >
                 <a if:true={it.first}
                     target="blank"
                     class="slds-text-link"
                     href={record.link}>
-                  <lightning-output-field class="slds-m-left-small"
+                  <lightning-output-field class="slds-m-left-small slds-m-vertical_none"
                                           field-name={it.value.name}
-                                          variant="label-hidden">
+                                          variant="label-hidden"  >
                   </lightning-output-field>
                 </a>
                 <lightning-output-field if:false={it.first}
-                                        class="slds-m-left-small"
+                                        class="slds-m-left-small slds-m-vertical_none"
                                         field-name={it.value.name}
-                                        variant="label-hidden">
+                                        variant="label-hidden"
+                                         >
                 </lightning-output-field>
               </div>
             </template>
