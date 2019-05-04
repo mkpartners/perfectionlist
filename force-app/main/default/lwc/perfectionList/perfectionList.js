@@ -184,17 +184,25 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
   }
 
   sort(records, column, direction) {
-    let sortedRecords;
-    if (direction === 'asc' || !direction) {
-      sortedRecords = records.sort((a, b) => {
-        return a[column] > b[column] || a[column] === null ? 1 : -1;
-      });
-    }
-    else if (direction === 'dsc') {
-      sortedRecords = records.sort((b, a) => {
-        return a[column] > b[column] ? 1 : -1;
-      });
-    }
+    let sortedRecords = records.sort((a, b) => {
+      let s;
+      if ( !this.isNotBlank(a[column])) {
+        s = 1;
+      }
+      else if ( !this.isNotBlank(b[column])) {
+        s = -1;
+      }
+      else if (a[column] === b[column]) {
+        s = 0;
+      }
+      else if (direction === 'asc') {
+        s = a[column] < b[column] ? -1 : 1;
+      }
+      else if (direction === 'dsc') {
+        s = a[column] < b[column] ? 1 : -1;
+      }
+      return s;
+    });
     return sortedRecords;
   }
 
