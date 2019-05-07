@@ -20,12 +20,7 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
   @track filterText = ''; // global search
   @track records; // array of original records returned from the DB
   @track selectedListView;
-
   @track showFilters; // boolean
-
-  @track colsAreStringsOrPhones = true;
-  // @track fields; // array of field names
-  @track sortOrder; // integer default 1
  
   @track recordCount = {
     showing: 0,
@@ -41,10 +36,22 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
   @track error;
 
   // Private variables
-  version = 'PerfectionList 0.1.5.1 made with <3 by MK Partners, Inc.'; // --> © ® ™ work
+  version = 'PerfectionList 0.1.5.2 made with <3 by MK Partners, Inc.'; // --> © ® ™ work
   _filteredRecords; // array of only the records being displayed
   _listViewsOptions;
   _queryDateTime;
+
+  get cardTitleLabel() {
+    let label = 'List';
+    if ( this.cardTitle !== undefined && this.cardTitle !== null && this.cardTitle.length > 0 ){
+      label = this.cardTitle;
+    }
+    return label;
+  }
+
+  get displayedRecords(){
+    return this._filteredRecords;
+  }
 
   get queryDateTime(){
     return this._queryDateTime;
@@ -60,18 +67,6 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
 
   get lvOptions() {
     return this._listViewsOptions;
-  }
-  
-  get displayedRecords(){
-    return this._filteredRecords;
-  }
-
-  get cardTitleLabel() {
-    let label = 'List';
-    if ( this.cardTitle !== undefined && this.cardTitle !== null && this.cardTitle.length > 0 ){
-      label = this.cardTitle;
-    }
-    return label;
   }
 
   get searchPlaceHolder() {
@@ -144,7 +139,6 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
           }
         }
         this._listViewsOptions = tempListViewsOptions;
-
         this.records = expanded_records;
         this._filteredRecords = expanded_records;
         this.columns = expanded_columns;
@@ -206,9 +200,9 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
     return sortedRecords;
   }
 
-  handleSObjectName(event) {
-    this.sObjectName = event.detail.value.trim();
-  }
+  // handleSObjectName(event) {
+  //   this.sObjectName = event.detail.value.trim();
+  // }
 
   handleListView(event) {
     this.selectedListView = event.detail.value;
@@ -347,8 +341,19 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
     return matchesFilter;
   }
 
+  dateIsWithin(thisDate, fromDate, throughDate){
+    let isGreaterThanFromDate = false;
+    let isLessThanThroughDate = false;
+    if ( null === fromDate || thisDate >= fromDate ){
+      isGreaterThanFromDate = true;
+    }
+    if ( null == throughDate || thisDate <= throughDate ){
+      isLessThanThroughDate = true;
+    }
+    return isGreaterThanFromDate && isLessThanThroughDate;
+  }
+
   containsString(searchingFor, searchingIn){
-    // this.log( {"searchingFor": searchingFor, "searchingIn": searchingIn} );
     let doesContainString;
     if ( null == searchingFor || undefined === searchingFor || searchingFor.trim().length === 0 ){
       doesContainString = true;
