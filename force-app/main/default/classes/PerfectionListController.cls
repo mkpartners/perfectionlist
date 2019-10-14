@@ -19,14 +19,6 @@ public with sharing class PerfectionListController {
       res.put( 'errors', e.getMessage() );
     }
 
-    // try {
-    //   if ( String.isNotBlank(sObjectName) ){
-    //     res.put( 'thisObject', getThisObject(sObjectName);
-    //   }
-    // } catch ( Exception e ){
-    //   res.put( 'errors', e.getMessage() );
-    // }
-
     try {
       Map<Id,ListView> listViewsOptions = queryListViewsOptions(sObjectName);
       res.put( 'listViewsOptions', listViewsOptions );
@@ -122,7 +114,6 @@ public with sharing class PerfectionListController {
     return res;
   }
   
-  //List<Map<String,Object>>
   public static Map<String,Object> getColumns(String sObjectName, String fieldsString){
     Map<String,Object> res = new Map<String,Object>();
     List<Map<String,Object>> columns = new List<Map<String,Object>>();
