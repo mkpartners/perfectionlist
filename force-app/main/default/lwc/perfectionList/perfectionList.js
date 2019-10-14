@@ -2,6 +2,7 @@
 import { LightningElement, api, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import initPFList from '@salesforce/apex/PerfectionListController.initPFList';
+import saveRecord from '@salesforce/apex/PerfectionListController.saveRecord';
 
 export default class PerfectionList extends NavigationMixin(LightningElement) {
 
@@ -10,13 +11,17 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
   @api cardTitle;
   @api sObjectName;
   @api fieldsString;
+  @api editableFieldsString;
   @api selectedListViewId;
   @api childRelationship;
   @api whereClause; // string
+  @api orderByField;
+  @api rowLimit;
   @api rowsDivStyle;
 
   // Attributes that are tracked because they may be modified
   @track columns; // array of column objects
+  @track dataTableColumns;
   @track filterText = ''; // global search
   @track records; // array of original records returned from the DB
   @track selectedListView;
@@ -34,6 +39,10 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
 
   @track _iconName;
   @track error;
+
+  get isFalse(){
+    return false;
+  }
 
   // Private variables
   version = 'PerfectionList 0.1.5.2 made with <3 by MK Partners, Inc.'; // --> © ® ™ work
@@ -82,7 +91,11 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
   }
 
   get columnGridLength() {
-    return 'slds-m-right_xx-small slds-truncate slds-col cell slds-size_1-of-' + this.columns.length;
+    let colLength = this.columns.length;
+    if ( colLength > 8 ){
+      colLength = 12;
+    }
+    return 'slds-m-right_xx-small slds-truncate slds-col cell slds-size_1-of-' + colLength;
   }
 
   get showListViewOptions(){
@@ -105,7 +118,9 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
       selectedListViewId: this.selectedListView,
       parentId: this.recordId,
       childRelationship: this.childRelationship,  
-      whereClause: this.whereClause
+      whereClause: this.whereClause,
+      orderByField: this.orderByField,
+      rowLimit: this.rowLimit
     })
       .then(res => {
         this.log('RES');
@@ -117,13 +132,27 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
         let ret_listViewsOptions = res.listViewsOptions;
 
         let expanded_columns = [];
+        let _dataTableColumns = [];
         for(let col = 0; col < res.columns.length; col++) {
           let newCol = res.columns[col];
+          let dataTableCol = {
+            sortable: true,
+            label: newCol.label, 
+            fieldName: newCol.name, 
+            type: newCol.type, 
+            editable: this.editableFieldsString.includes(newCol.name) 
+          };
+          _dataTableColumns.push(dataTableCol);
+          newCol.className = this.columnGridLength;
+          if ( newCol.displayType === 'PICKLIST' ){
+            newCol.className += ' overflowVisible';
+          }
           newCol.iconName = 'utility:sort';
           newCol.iconState = false;
+          newCol.isEditable = this.editableFieldsString.includes(newCol.name);
           expanded_columns.push(newCol);
         }
-
+        this.dataTableColumns = _dataTableColumns;
         let expanded_records = [];
         for (let rec = 0; rec < res.records.length; rec++) {
           let newRecord = res.records[rec];
@@ -151,17 +180,13 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
       });
   }
 
-  toggleFilterList(){
-    this.showFilters = !this.showFilters;
-  }
-
   alphabetize(event) {
     let columnToSortBy = event.currentTarget.dataset.value;
     let colIndex = event.currentTarget.dataset.index;
     let direction = this.sortState.direction;
     let column = this.sortState.column;
 
-    let directionToSortBy = column === columnToSortBy && direction === 'asc' ? 'dsc' : 'asc';
+    let directionToSortBy = column === columnToSortBy && direction === 'asc' ? 'desc' : 'asc';
     this.sortState.direction = directionToSortBy;
     this.sortState.column = columnToSortBy;
 
@@ -174,6 +199,28 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
     }
     this.columns[colIndex].iconName = utilityIcon;
     this.columns[colIndex].iconState = true;
+    this.filterRecords();
+  }
+
+  toggleFilterList(){
+    this.showFilters = !this.showFilters;
+  }
+  @track sortedBy;
+  @track sortDirection;
+
+  updateColumnSorting(event) {
+    let fieldName = event.detail.fieldName;
+    let sortDirection = event.detail.sortDirection;
+    this.log(fieldName + ' '+ sortDirection);
+    this.sortedBy = fieldName;
+    this.sortDirection = sortDirection;
+    this.sortData();
+  }
+
+  sortData() {
+    this.sortState.direction = this.sortDirection;
+    this.sortState.column = this.sortedBy;
+    this._filteredRecords = this.sort(this.records, this.sortedBy, this.sortDirection);
     this.filterRecords();
   }
 
@@ -192,7 +239,7 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
       else if (direction === 'asc') {
         s = a[column] < b[column] ? -1 : 1;
       }
-      else if (direction === 'dsc') {
+      else if (direction === 'desc') {
         s = a[column] < b[column] ? 1 : -1;
       }
       return s;
@@ -241,6 +288,32 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
     }
     this.columns = columnList;
     this.filterRecords();
+  }
+
+  handleFieldChange(event){
+    this.log( event.target );
+  }
+
+  handleSave(event){
+    let saveDraftValues = event.detail.draftValues;
+    let record = saveDraftValues[0];
+    let rowId = record.id;
+    rowId = rowId.substring(4);
+    let row = this._filteredRecords[rowId];
+    record.Id = row.Id;
+    delete record.id;
+    this.log(record);
+
+    saveRecord({
+      record: JSON.stringify(record) 
+    })
+      .then(res => {
+        this.log(res);
+      })
+      .catch(err => {
+        this.log( err );
+        this.error = err;
+      });
   }
 
   filterRecords(){
@@ -374,10 +447,16 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
     // Retain filter state
   }
 
-  log(obj) {
-    let string = JSON.stringify(obj);
-    let retObj = (string !== undefined) ? JSON.parse(string) : obj;
-    console.log(retObj);
+  log(...args) {
+    for (let i = 0; i < args.length; i++) {
+      let arg = args[i];
+      let item = typeof arg === 'object' && arg !== undefined ? this.peel(arg) : arg;
+      console.log(item);
+    }
+  }
+  
+  peel(obj) {
+    return JSON.parse(JSON.stringify(obj));
   }
 
 }
