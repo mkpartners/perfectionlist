@@ -374,10 +374,16 @@ export default class PerfectionList extends NavigationMixin(LightningElement) {
     // Retain filter state
   }
 
-  log(obj) {
-    let string = JSON.stringify(obj);
-    let retObj = (string !== undefined) ? JSON.parse(string) : obj;
-    console.log(retObj);
+  log(...args) {
+    for (let i = 0; i < args.length; i++) {
+      let arg = args[i];
+      let item = typeof arg === 'object' && arg !== undefined ? this.peel(arg) : arg;
+      console.log(item);
+    }
+  }
+  
+  peel(obj) {
+    return JSON.parse(JSON.stringify(obj));
   }
 
 }
