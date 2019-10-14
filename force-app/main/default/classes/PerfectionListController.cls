@@ -1,6 +1,15 @@
 public with sharing class PerfectionListController {
 
   @AuraEnabled
+  /**
+   * @name  initPFList
+   * @param sObjectName {String}
+   * @param selectedListViewId {String}
+   * @param fieldsString {String}
+   * @param parentId {String}
+   * @param childRelationship {String}
+   * @param whereClause {String}
+   */
   public static Map<String,Object> initPFList(
     String sObjectName,
     String selectedListViewId,
